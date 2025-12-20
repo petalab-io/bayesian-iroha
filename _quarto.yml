@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "bayesian-iroha"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+
+# 重要：Poetryの仮想環境を反映させるためのJupyter設定
+jupyter: python3
