@@ -3,7 +3,7 @@ project:
   output-dir: _site
 
 website:
-  title: "bayesian-iroha"
+  title: "Bayesian Iroha"
   navbar:
     left:
       - href: index.qmd
@@ -16,3 +16,6 @@ format:
 
 # 重要：Poetryの仮想環境を反映させるためのJupyter設定
 jupyter: python3
+
+execute:
+  freeze: auto  # 変更があった時だけ再実行。または true (実行しない)
