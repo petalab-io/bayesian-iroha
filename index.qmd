@@ -1,8 +1,14 @@
 ---
-title: "Bayesian Iroha"
+title: "ベイジアンいろは"
 ---
 
-## Project 概要
+## 概要
 小規模データ×階層ベイズでビジネスの勝率を導く「意思決定のいろは」。PyMC v5を用い、単なる有意差検定を超えたROPE/ROI分析によるリスク可視化フレームワークを実装・蓄積するナレッジベース。
 
-### コンテンツ
+### 分析レポート
+
+ここには、本プロジェクトで実施した分析レポートを掲載しています。
+
+#### Web高速化施策のROI分析
+- [プロジェクト概要（README）](notebooks/01_web_performance/README.md)
+- [分析実証ログ（Notebook）](notebooks/01_web_performance/roi_decision.ipynb)

@@ -3,15 +3,18 @@ project:
   output-dir: _site
 
 website:
-  title: "Bayesian Iroha"
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
+  title: "ベイジアンいろは"
+  sidebar:
+    style: "floating"
+    contents:
+      - section: "Web Performance ROI Analysis"
+        contents:
+          - notebooks/01_web_performance/README.md
+          - notebooks/01_web_performance/roi_decision.ipynb
 
 format:
   html:
-    theme: cosmo
+    theme: lux
     toc: true
 
 # 重要：Poetryの仮想環境を反映させるためのJupyter設定
