@@ -219,3 +219,7 @@ __marimo__/
 # IDE
 .idea
 .ai-instructions
+
+# Open Data
+notebooks/*/*.zip
+notebooks/*/data_raw/*
