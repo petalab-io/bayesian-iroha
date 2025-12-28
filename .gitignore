@@ -223,3 +223,6 @@ __marimo__/
 # Open Data
 notebooks/*/*.zip
 notebooks/*/data_raw/*
+
+# Model
+*.nc
