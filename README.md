@@ -44,102 +44,65 @@ WSL (Ubuntu) 上の Pyenv + Poetry 環境で構築します。
 プロジェクトルートで以下のコマンドを実行し、環境をセットアップしてください。
 
 ```bash
-# 1. PyenvでPythonバージョンを指定 (PyMC v5推奨環境)
-pyenv local 3.11.9
+# 1. PyenvでPythonバージョンを指定
+pyenv local 3.12.8
 
 # 2. Poetry環境をPyenvのPythonに紐づけ
 poetry env use $(pyenv which python)
 
 # 3. 依存ライブラリのインストール
-# (初回作成時)
-poetry init
-poetry add pymc arviz pandas numpy seaborn matplotlib jupyter ipykernel
-# (2回目以降/clone時)
 poetry install
 ```
 
-### 2. DataSpell (IDE) の設定
+### 2. Quarto (ドキュメント生成ツール)
 
-JetBrains DataSpell で Poetry 環境を認識させます。
-
-1.  DataSpell でプロジェクトフォルダを開く。
-2.  右下のインタープリタ表示（または `File` > `Settings` > `Project: bayesian-iroha` > `Python Interpreter`）をクリック。
-3.  `Add New Interpreter` > `On WSL...` を選択。
-4.  `Poetry Environment` を選択。
-    * **Base interpreter**: Pyenv で指定したパス（自動検出されるはずです）。
-    * **Poetry executable**: WSL上のパス（例: `/home/user/.local/bin/poetry`）。
-5.  `OK` を押して環境を作成・適用します。
-
-### 3. Quarto (ドキュメント生成ツール)
-[Quarto公式サイト](https://quarto.org/docs/get-started/) からCLIをインストールしてください（WSL上であれば `.deb` パッケージ推奨）。
+WSL上であれば `.deb` パッケージを使用してインストールします。
 
 ```bash
 # Ubuntu/Debian (WSL)
-wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.3.450/quarto-1.3.450-linux-amd64.deb
-sudo dpkg -i quarto-1.3.450-linux-amd64.deb
+wget [https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.40/quarto-1.6.40-linux-amd64.deb](https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.40/quarto-1.6.40-linux-amd64.deb)
+sudo dpkg -i quarto-1.6.40-linux-amd64.deb
+rm quarto-1.6.40-linux-amd64.deb
 ```
 
 ## 🚀 学習・更新ワークフロー
 
-新しいビジネス課題（ユースケース）を追加する際の手順です。
-
-### Step 1. Gem (Bayesian Strategy Partner) に相談
+### Step 1. Gem に相談
 カスタムGemに課題を投げ、レポート構成とコードを出力させます。
 
-> **プロンプト例:**
-> 「小売店における『価格弾力性』の検証をしたいです。データは各店舗2週間分しかありません。DeepResearchへの依頼用プロンプトと、PyMCの実装方針を提示してください。」
-
 ### Step 2. DeepResearch でレポート作成
-Gem が出力したプロンプトを DeepResearch に入力し、理論的背景とビジネスロジックを含むレポートを生成させます。
+理論的背景とビジネスロジックを含むレポートを生成させます。
 
 ### Step 3. コンテンツの配置
-1.  `notebooks/` 配下に連番でディレクトリを作成します（例: `03_hr_analytics`）。
-2.  DeepResearch のレポートを **`README.md`** として保存します。
-    * **重要**: 先頭にQuarto用のYAMLヘッダー（以下参照）を追加してください。
-    
-    ```yaml
-    ---
-    title: "レポートのタイトル"
-    author: "Author Name"
-    date: "2025-01-01"
-    ---
-    ```
-
-3.  Gem/DeepResearch のコードを元に **`analysis.ipynb`** を作成し、実行します。
-    * DataSpell 上でカーネルとして **「Poetry (bayesian-iroha)」** が選択されていることを確認してください。
-    * 必要に応じて `src` の共通関数を import してコードをスリム化してください。
+`notebooks/` 配下にディレクトリを作成し、`README.md` と `analysis.ipynb` を配置します。
 
 ### Step 4. サイトへの追加
-ルート直下にある `_quarto.yml` の `sidebar` セクションに、新しいファイルへのパスを追加します。
+`_quarto.yml` の `sidebar` セクションに、新しいファイルへのパスを追加します。
 
-```yaml
-      - section: "HR Analytics"
-        contents:
-          - text: "理論: 採用媒体のABテスト"
-            file: notebooks/03_hr_analytics/README.md
-          - text: "実践: 階層ベータモデル"
-            file: notebooks/03_hr_analytics/analysis.ipynb
-```
+### Step 5. レンダリングと公開
 
-### Step 5. レンダリング
-以下のコマンドでローカルプレビューを行い、問題なければコミットします。
+以下の手順でサイトを最新の状態に更新します。
 
 ```bash
-quarto preview
+# 1. キャッシュと生成物のクリーンアップ（反映されない場合）
+rm -rf .quarto _site
+
+# 2. ローカルでのレンダリング確認
+poetry run quarto render
+
+# 3. ソースコードの保存
+git add .
+git commit -m "feat: new notebook added"
+git push origin main
+
+# 4. サイトの公開（GitHub Pagesなど）
+poetry run quarto publish gh-pages
 ```
 
 ## 📚 共通ライブラリ (`src/`) について
 
-* **`models.py`**: 小規模データで頻発する Divergences を防ぐための「非中心化（Non-centered Parameterization）」を実装したモデルファクトリー。
-* **`viz.py`**: ROPE（実質的等価領域）や ROI分布を描画する定型プロット関数。
-
-## 🤖 Gem 設定情報 (Reference)
-
-このレポジトリのコンテンツ生成に使用しているカスタムGemの設定概要です。
-
-* **Name**: Bayesian Strategy Partner
-* **Focus**: SMB市場, PyMC v5, Non-centered param, ROPE/ROI Analysis
-* **Knowledge**: `pymc_v5_best_practices.txt`, `bayesian_business_glossary.txt` を参照済み。
+* **`models.py`**: 小規模データで頻発する Divergences を防ぐための「非中心化（Non-centered Parameterization）」を実装。
+* **`viz.py`**: ROPE（実質的等価領域）や ROI分布を描画する関数。
 
 ---
 Author: petaLab
