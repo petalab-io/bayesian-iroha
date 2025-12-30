@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Hockey Spatial Analysis: 空間統計による真の貢献度可視化プロジェクト – ベイジアンいろは</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2df5bd0b2bf7f82aff587e37ec50217e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../notebooks/02_hockey_gotender/hockey_spatial_analysis.html">Hockey Spatial Analysis: 空間統計による真の貢献度可視化プロジェクト</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">ベイジアンいろは</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Web Performance ROI Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/01_web_performance/roi_decision.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">エグゼクティブサマリー</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">spatial model Analysis</span></span>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#データ準備preparation" id="toc-データ準備preparation" class="nav-link active" data-scroll-target="#データ準備preparation">1. データ準備（Preparation）</a></li>
+  <li><a href="#データ加工processing" id="toc-データ加工processing" class="nav-link" data-scroll-target="#データ加工processing">2. データ加工（Processing）</a>
+  <ul class="collapse">
+  <li><a href="#スプライン基底関数" id="toc-スプライン基底関数" class="nav-link" data-scroll-target="#スプライン基底関数">スプライン基底関数</a></li>
+  </ul></li>
+  <li><a href="#確率モデル構築modeling" id="toc-確率モデル構築modeling" class="nav-link" data-scroll-target="#確率モデル構築modeling">3. 確率モデル構築（Modeling）</a>
+  <ul class="collapse">
+  <li><a href="#確率モデル構造の解読graphviz-の見方" id="toc-確率モデル構造の解読graphviz-の見方" class="nav-link" data-scroll-target="#確率モデル構造の解読graphviz-の見方">確率モデル構造の解読（Graphviz の見方）</a></li>
+  <li><a href="#この構造がビジネスにもたらす価値" id="toc-この構造がビジネスにもたらす価値" class="nav-link" data-scroll-target="#この構造がビジネスにもたらす価値">この構造がビジネスにもたらす価値</a></li>
+  </ul></li>
+  <li><a href="#推論とモデル診断diagnostics" id="toc-推論とモデル診断diagnostics" class="nav-link" data-scroll-target="#推論とモデル診断diagnostics">4. 推論とモデル診断（Diagnostics）</a>
+  <ul class="collapse">
+  <li><a href="#hatr-r-hat-指標" id="toc-hatr-r-hat-指標" class="nav-link" data-scroll-target="#hatr-r-hat-指標"><span class="math inline">\(\hat{R}\)</span> (R-hat) 指標</a></li>
+  </ul></li>
+  <li><a href="#戦略的評価３層フィルタリング" id="toc-戦略的評価３層フィルタリング" class="nav-link" data-scroll-target="#戦略的評価３層フィルタリング">5. 戦略的評価（３層フィルタリング）</a>
+  <ul class="collapse">
+  <li><a href="#第２層-rope実質的評価" id="toc-第２層-rope実質的評価" class="nav-link" data-scroll-target="#第２層-rope実質的評価">第２層: ROPE（実質的評価）</a></li>
+  <li><a href="#第３層-roi-経済的評価" id="toc-第３層-roi-経済的評価" class="nav-link" data-scroll-target="#第３層-roi-経済的評価">第３層: ROI (経済的評価)</a></li>
+  <li><a href="#ベイズによるスポーツビジネスの不確実へアプローチ" id="toc-ベイズによるスポーツビジネスの不確実へアプローチ" class="nav-link" data-scroll-target="#ベイズによるスポーツビジネスの不確実へアプローチ">ベイズによるスポーツビジネスの不確実へアプローチ</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../notebooks/02_hockey_gotender/hockey_spatial_analysis.html">Hockey Spatial Analysis: 空間統計による真の貢献度可視化プロジェクト</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Hockey Spatial Analysis: 空間統計による真の貢献度可視化プロジェクト</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>本ノートブックでは、MoneyPuck.com から取得した 2024 年シーズンの実ショットデータを用い、シュートの「場所の難易度」を考慮した上でゴテンダーの真の実力（GSAx）を推定します。 特に、データが限られた「小規模データ（500件）」環境において、ベイズ階層モデルがいかにして安定した意思決定を支援するかを、3層の戦略的フィルタリングを通じて実証します。</p>
+<div id="5330b508b2df9f29" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:07.517688Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:06.326572Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 必要なライブラリ</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> cycler <span class="im">import</span> cycler</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> SplineTransformer</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 不要な出力の制御</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8437bc591537fb42" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:07.548280Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:07.535978Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># プロジェクト共通のカラー定義（実際の運用では /src にモジュール化を推奨）</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>COLOR_PURPLE <span class="op">=</span> <span class="st">"#9B5DE5"</span>  <span class="co"># 事後分布・HDI</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>COLOR_YELLOW <span class="op">=</span> <span class="st">"#F9C74F"</span>  <span class="co"># ROPE領域</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>COLOR_GREEN <span class="op">=</span> <span class="st">"#06D6A0"</span>  <span class="co"># 改善判定</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>COLOR_RED <span class="op">=</span> <span class="st">"#EF476F"</span>  <span class="co"># 悪化判定</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>COLOR_GRAY <span class="op">=</span> <span class="st">"#8D99AE"</span>  <span class="co"># 等価判定・参照線</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.rcdefaults()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>palette_brand <span class="op">=</span> [COLOR_PURPLE, COLOR_YELLOW, COLOR_GREEN, COLOR_RED, COLOR_GRAY]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>, palette<span class="op">=</span>palette_brand)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"axes.prop_cycle"</span>] <span class="op">=</span> cycler(color<span class="op">=</span>palette_brand)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Brand Style Applied: The visual identity was applied."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Brand Style Applied: The visual identity was applied.</code></pre>
+</div>
+</div>
+<p>分析に必要な統計・可視化ライブラリをロードし、レポートの品質を担保するためのデザイン設定（<code>Seaborn</code> / <code>Japanize-Matplotlib</code>）を行います。</p>
+<blockquote class="blockquote">
+<p>Tips:</p>
+<p>分析結果のビジュアルを統一し、どのグラフを見ても「紫は実力、緑は成功」と直感的に理解できるようにしています。</p>
+<p>Color Cycle グラフを描画する際、色が指定されていない場合に自動的に適用される色の順番です。 最初は紫、次を黄色…と決めておくことで、毎回指定しなくても色が揃います。</p>
+<p>ビジネスレポートにおいて「色の意味」を固定することは、意思決定のスピードを劇的に高めます。 複数の Notebook を管理する実務現場では、これを共通モジュール化し、メンテナンス姓を高めることを推奨します。</p>
+</blockquote>
+<section id="データ準備preparation" class="level2">
+<h2 class="anchored" data-anchor-id="データ準備preparation">1. データ準備（Preparation）</h2>
+<p>外部ソース（<a href="https://moneypuck.com/">Moneypuck.com</a>）から ZIP形式の巨大なデータセットを自動取得し、解析可能な状態に展開します。</p>
+<div id="bcc1b06e61670758" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:16.068131Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:07.601878Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># データのダウンロード（MoneyPuck 2024 shots Data）</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>URL_DATA <span class="op">=</span> <span class="st">"https://peter-tanner.com/moneypuck/downloads/shots_2024.zip"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>DIR_EXTRACT <span class="op">=</span> <span class="st">"data_raw"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>NAME_ZIP <span class="op">=</span> <span class="st">"shots_2024.zip"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>NAME_CSV <span class="op">=</span> <span class="st">"shots_2024.csv"</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>PATH_CSV <span class="op">=</span> os.path.join(DIR_EXTRACT, NAME_CSV)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(PATH_CSV):</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># すでに CSV が存在する場合はスキップ</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Data Preparation: Local CSV found at </span><span class="sc">{</span>PATH_CSV<span class="sc">}</span><span class="ss">. Skipping download."</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ファイルがない場合: ダウンロードと展開を実行する</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Data Preparation: CSV not found. Starting automated setup..."</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 保存先ディレクトリの作成</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.path.exists(DIR_EXTRACT):</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        os.makedirs(DIR_EXTRACT)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Data Preparation: Created directory '</span><span class="sc">{</span>DIR_EXTRACT<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ダウンロード</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Data Preparation: Downloading from </span><span class="sc">{</span>URL_DATA<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        response <span class="op">=</span> requests.get(URL_DATA)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(NAME_ZIP, <span class="st">"wb"</span>) <span class="im">as</span> f:</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>            f.write(response.content)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ZIP の展開</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Data Preparation: Extracting </span><span class="sc">{</span>NAME_ZIP<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> zipfile.ZipFile(NAME_ZIP, <span class="st">"r"</span>) <span class="im">as</span> ref_zip:</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>            ref_zip.extractall(DIR_EXTRACT)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 元の ZIP ファイルの削除（クリーンアップ）</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> os.path.exists(NAME_ZIP):</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>            os.remove(NAME_ZIP)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Data Preparation: Cleand up temporary ZIP file '</span><span class="sc">{</span>NAME_ZIP<span class="sc">}</span><span class="ss">'"</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 展開ファイルの確認</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        files <span class="op">=</span> os.listdir(DIR_EXTRACT)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Data Preparation: Extracted files: </span><span class="sc">{</span>files<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Data Preparation Error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data Preparation: CSV not found. Starting automated setup...
+Data Preparation: Downloading from https://peter-tanner.com/moneypuck/downloads/shots_2024.zip...
+Data Preparation: Extracting shots_2024.zip...
+Data Preparation: Cleand up temporary ZIP file 'shots_2024.zip'
+Data Preparation: Extracted files: ['shots_2024.csv', 'goalie_final_investment_report.csv', 'data_goalie_rope_analysis.csv', 'final_roi_report_chart.png']</code></pre>
+</div>
+</div>
+<div id="9cfe1e12968abe26" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:16.332799Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:16.229284Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># データのプレビュー（ホワイトボックス化）</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>CSV_TARGET <span class="op">=</span> os.path.join(DIR_EXTRACT, <span class="st">"shots_2024.csv"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 先頭５行を確認</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>df_preview <span class="op">=</span> pd.read_csv(CSV_TARGET, nrows<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Data Preparation: Preview of the data:"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>df_preview.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data Preparation: Preview of the data:</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">shotID</th>
+<th data-quarto-table-cell-role="th">arenaAdjustedShotDistance</th>
+<th data-quarto-table-cell-role="th">arenaAdjustedXCord</th>
+<th data-quarto-table-cell-role="th">arenaAdjustedXCordABS</th>
+<th data-quarto-table-cell-role="th">arenaAdjustedYCord</th>
+<th data-quarto-table-cell-role="th">arenaAdjustedYCordAbs</th>
+<th data-quarto-table-cell-role="th">averageRestDifference</th>
+<th data-quarto-table-cell-role="th">awayEmptyNet</th>
+<th data-quarto-table-cell-role="th">awayPenalty1Length</th>
+<th data-quarto-table-cell-role="th">awayPenalty1TimeLeft</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">xCordAdjusted</th>
+<th data-quarto-table-cell-role="th">xFroze</th>
+<th data-quarto-table-cell-role="th">xGoal</th>
+<th data-quarto-table-cell-role="th">xPlayContinuedInZone</th>
+<th data-quarto-table-cell-role="th">xPlayContinuedOutsideZone</th>
+<th data-quarto-table-cell-role="th">xPlayStopped</th>
+<th data-quarto-table-cell-role="th">xRebound</th>
+<th data-quarto-table-cell-role="th">xShotWasOnGoal</th>
+<th data-quarto-table-cell-role="th">yCord</th>
+<th data-quarto-table-cell-role="th">yCordAdjusted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>52.0</td>
+<td>57.0</td>
+<td>57.0</td>
+<td>-41.0</td>
+<td>41.0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>57</td>
+<td>0.238455</td>
+<td>0.012537</td>
+<td>0.394229</td>
+<td>0.301072</td>
+<td>0.022807</td>
+<td>0.030900</td>
+<td>0.710867</td>
+<td>-40</td>
+<td>-40</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>33.0</td>
+<td>71.0</td>
+<td>71.0</td>
+<td>-28.0</td>
+<td>28.0</td>
+<td>-6.0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>71</td>
+<td>0.198306</td>
+<td>0.021962</td>
+<td>0.404919</td>
+<td>0.313773</td>
+<td>0.023774</td>
+<td>0.037266</td>
+<td>0.759039</td>
+<td>-28</td>
+<td>-28</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>48.0</td>
+<td>48.0</td>
+<td>48.0</td>
+<td>-24.0</td>
+<td>24.0</td>
+<td>-12.6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>48</td>
+<td>0.213829</td>
+<td>0.028057</td>
+<td>0.405311</td>
+<td>0.294682</td>
+<td>0.025849</td>
+<td>0.032272</td>
+<td>0.696901</td>
+<td>-24</td>
+<td>-24</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>58.0</td>
+<td>-40.0</td>
+<td>40.0</td>
+<td>-31.0</td>
+<td>31.0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>41</td>
+<td>0.209478</td>
+<td>0.009832</td>
+<td>0.449775</td>
+<td>0.277671</td>
+<td>0.019667</td>
+<td>0.033577</td>
+<td>0.610530</td>
+<td>-31</td>
+<td>31</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>56.0</td>
+<td>-35.0</td>
+<td>35.0</td>
+<td>15.0</td>
+<td>15.0</td>
+<td>0.0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>36</td>
+<td>0.376712</td>
+<td>0.028884</td>
+<td>0.307725</td>
+<td>0.205568</td>
+<td>0.022266</td>
+<td>0.058845</td>
+<td>0.799576</td>
+<td>15</td>
+<td>-15</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 137 columns</p>
+</div>
+</div>
+</div>
+<p>膨大なカラムを持つデータから、空間的な「期待ゴール率」と「ゴテンダー評価」に直結する最小限の変数のみを抽出してロードします。</p>
+<div id="4fd5c36cdb2905f0" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:17.187920Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:16.503899Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 利用する列を展開してロード（メモリ効率化）</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>COLS_USE <span class="op">=</span> [</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shotID"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"goal"</span>,  <span class="co"># 1: Goal, 0: No Goal</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"xCordAdjusted"</span>,  <span class="co"># 調整済み x 座標</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"yCordAdjusted"</span>,  <span class="co"># 調整済み y 座標</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"goalieIdForShot"</span>,  <span class="co"># ゴテンダー ID</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"goalieNameForShot"</span>  <span class="co"># 選手名</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Data Preparation: Loading real dataset from CSV..."</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>df_raw <span class="op">=</span> pd.read_csv(CSV_TARGET, usecols<span class="op">=</span>COLS_USE)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data Preparation: Data load finished. </span><span class="sc">{</span><span class="bu">len</span>(df_raw)<span class="sc">:,}</span><span class="ss"> rows"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>df_raw.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data Preparation: Loading real dataset from CSV...
+Data Preparation: Data load finished. 119,870 rows</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">shotID</th>
+<th data-quarto-table-cell-role="th">goal</th>
+<th data-quarto-table-cell-role="th">goalieIdForShot</th>
+<th data-quarto-table-cell-role="th">goalieNameForShot</th>
+<th data-quarto-table-cell-role="th">xCordAdjusted</th>
+<th data-quarto-table-cell-role="th">yCordAdjusted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>0</td>
+<td>8480045</td>
+<td>Ukko-Pekka Luukkonen</td>
+<td>57</td>
+<td>-40</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>0</td>
+<td>8480045</td>
+<td>Ukko-Pekka Luukkonen</td>
+<td>71</td>
+<td>-28</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>0</td>
+<td>8480045</td>
+<td>Ukko-Pekka Luukkonen</td>
+<td>48</td>
+<td>-24</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>0</td>
+<td>8474593</td>
+<td>Jacob Markstrom</td>
+<td>41</td>
+<td>31</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>0</td>
+<td>8474593</td>
+<td>Jacob Markstrom</td>
+<td>36</td>
+<td>-15</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>投影（Projection / usecols） - 巨大なデータセットから、特定の属性（列）のみの選択をしてメモリに読み込むようにします。 データ全てを覚えるのではなく、必要なカラムだけを抽出することで作業効率を劇的に上げるテクニックです。</p>
+</section>
+<section id="データ加工processing" class="level2">
+<h2 class="anchored" data-anchor-id="データ加工processing">2. データ加工（Processing）</h2>
+<p>キーバーがいない状況でのゴールなど、能力評価においてノイズとなるデータを除外します。</p>
+<div id="d8c52818ee1e6111" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:18.335673Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:18.275167Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># クレンジング:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df_raw.dropna(subset<span class="op">=</span>[<span class="st">"goalieIdForShot"</span>]).copy()  <span class="co"># ゴテンダー不在（Empty Net）データの厳密な除外</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df_clean[df_clean[<span class="st">"goalieIdForShot"</span>] <span class="op">&gt;</span> <span class="dv">0</span>].copy()  <span class="co"># MoneyPuck データでは無人ゴール時に ID が 0 や欠損になるため、これを除外します。</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data Processing: </span><span class="sc">{</span><span class="bu">len</span>(df_clean)<span class="sc">:,}</span><span class="ss"> rows left after cleaning."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data Processing: 118,900 rows left after cleaning.</code></pre>
+</div>
+</div>
+<p>データが少ない環境（新規事業や特定セグメントの分析）を再現し、不可実性下での判断プロセスを構築します。</p>
+<div id="1a8b45f3fc0bc955" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:18.705675Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:18.656013Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 小規模データ化（３桁台のサンプリング）</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 意思決定の難易度が高い「事例が少ない」状況を再現するため、あえて 500 件に絞ります</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>SIZE_SAMPLE <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>df_small <span class="op">=</span> df_clean.sample(n<span class="op">=</span>SIZE_SAMPLE, random_state<span class="op">=</span><span class="dv">42</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>df_small</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">shotID</th>
+<th data-quarto-table-cell-role="th">goal</th>
+<th data-quarto-table-cell-role="th">goalieIdForShot</th>
+<th data-quarto-table-cell-role="th">goalieNameForShot</th>
+<th data-quarto-table-cell-role="th">xCordAdjusted</th>
+<th data-quarto-table-cell-role="th">yCordAdjusted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>77213</td>
+<td>0</td>
+<td>8480947</td>
+<td>Kevin Lankinen</td>
+<td>57</td>
+<td>-17</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>62564</td>
+<td>1</td>
+<td>8482487</td>
+<td>Jakub Dobes</td>
+<td>42</td>
+<td>12</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>50703</td>
+<td>0</td>
+<td>8480382</td>
+<td>Alexandar Georgiev</td>
+<td>76</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>80853</td>
+<td>1</td>
+<td>8479406</td>
+<td>Filip Gustavsson</td>
+<td>72</td>
+<td>14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>65495</td>
+<td>0</td>
+<td>8481020</td>
+<td>Justus Annunen</td>
+<td>23</td>
+<td>-39</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">495</td>
+<td>43089</td>
+<td>0</td>
+<td>8475683</td>
+<td>Sergei Bobrovsky</td>
+<td>56</td>
+<td>-12</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">496</td>
+<td>50168</td>
+<td>0</td>
+<td>8481611</td>
+<td>Pyotr Kochetkov</td>
+<td>66</td>
+<td>35</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">497</td>
+<td>15962</td>
+<td>0</td>
+<td>8480280</td>
+<td>Jeremy Swayman</td>
+<td>62</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">498</td>
+<td>68658</td>
+<td>0</td>
+<td>8475683</td>
+<td>Sergei Bobrovsky</td>
+<td>37</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">499</td>
+<td>41174</td>
+<td>0</td>
+<td>8481692</td>
+<td>Dustin Wolf</td>
+<td>37</td>
+<td>-13</td>
+</tr>
+</tbody>
+</table>
+
+<p>500 rows × 6 columns</p>
+</div>
+</div>
+</div>
+<p>カテゴリ変数（ID）を確率モデルが扱える形式に変換し、結果の解釈をしやすくするための紐付けを行います。</p>
+<div id="b3645051eca6ccc8" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:20.276837Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:20.217081Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># インデックス化</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 選手ID を 0 からの連番に変換し、ID から名前を引く辞書を作成します</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>codes_goalie, uniques_goalie <span class="op">=</span> pd.factorize(df_small[<span class="st">"goalieIdForShot"</span>])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>df_small[<span class="st">"idx_goalie"</span>] <span class="op">=</span> codes_goalie</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>df_small[<span class="st">"obs_shots"</span>] <span class="op">=</span> df_small[<span class="st">"goal"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ID から名前を引くためのマップ</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>id_to_name <span class="op">=</span> df_small.set_index(<span class="st">"idx_goalie"</span>)[<span class="st">"goalieNameForShot"</span>].to_dict()</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data Processing: unique count of Goalie </span><span class="sc">{</span><span class="bu">len</span>(uniques_goalie)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>df_small[[<span class="st">"goalieIdForShot"</span>, <span class="st">"idx_goalie"</span>, <span class="st">"obs_shots"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data Processing: unique count of Goalie 79</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">goalieIdForShot</th>
+<th data-quarto-table-cell-role="th">idx_goalie</th>
+<th data-quarto-table-cell-role="th">obs_shots</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>8480947</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>8482487</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>8480382</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>8479406</td>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>8481020</td>
+<td>4</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">495</td>
+<td>8475683</td>
+<td>25</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">496</td>
+<td>8481611</td>
+<td>30</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">497</td>
+<td>8480280</td>
+<td>18</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">498</td>
+<td>8475683</td>
+<td>25</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">499</td>
+<td>8481692</td>
+<td>29</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+<p>500 rows × 3 columns</p>
+</div>
+</div>
+</div>
+<p>座標（<span class="math inline">\(x\)</span>, <span class="math inline">\(y\)</span>）とう数値を、モデルが「どのエリアが危険か」を滑らかに学習できる高度な特徴量に変換します。</p>
+<div id="8a9e91abb27c5a36" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-29T02:57:47.877510Z&quot;,&quot;start_time&quot;:&quot;2025-12-29T02:57:47.701452Z&quot;}" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 特徴量生成（空間基底関数の適用）</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 座標データから滑らかな空間曲面（スプライン基底）を生成します</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>spline <span class="op">=</span> SplineTransformer(n_knots<span class="op">=</span><span class="dv">5</span>, degree<span class="op">=</span><span class="dv">3</span>, include_bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>basis_spatial <span class="op">=</span> spline.fit_transform(df_small[[<span class="st">"xCordAdjusted"</span>, <span class="st">"yCordAdjusted"</span>]])</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data Processing: Feature matrix calculation </span><span class="sc">{</span>basis_spatial<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Data Processing: Feature matrix calculation (500, 12)</code></pre>
+</div>
+</div>
+<p>このセルでは、「シュート位置（x, y）」という単純な 2 つの数値を、この SplineTransformer に通すことで、 <strong>「ゴール付近ならこの値が大きくなる」「端の方ならこの値が変化する」といった、 空間的な特徴を持つ複数の変数（多次元の行列）</strong> へと変換しています。</p>
+<p>これにより、モデルは「座標 (x, y)」をただの数字としてではなく、 「リンク上のどのエリアがゴールになりやすいか」という滑らかな非線形の関係として学習できるようになります。</p>
+<section id="スプライン基底関数" class="level3">
+<h3 class="anchored" data-anchor-id="スプライン基底関数">スプライン基底関数</h3>
+<p>一言でいうと、<strong>「複雑な1つの曲面を、いくつかの『シンプルな山の形（部品）』の組み合わせで表現する仕組み」</strong> のことです。</p>
+<section id="基底きていとは部品のこと" class="level4">
+<h4 class="anchored" data-anchor-id="基底きていとは部品のこと">1. 「基底（きてい）」とは「部品」のこと</h4>
+<p>例えば、絵の具で「オレンジ色」を作るとき、「赤」と「黄色」を混ぜます。このとき、赤と黄色が<strong>「基底（部品）」</strong>です。 データ分析における基底関数も同じです。 「座標 (x, y)」という生データをそのまま使うのではなく、<strong>「特定のエリアに反応するいくつかの部品（関数）」</strong>に変換します。</p>
+</section>
+<section id="スプライン基底関数の仕組みイメージ" class="level4">
+<h4 class="anchored" data-anchor-id="スプライン基底関数の仕組みイメージ">2. スプライン基底関数の仕組み（イメージ）</h4>
+<p>アイスホッケーのリンクを想像してください。 1. エリアの分割: リンクの上に、いくつかの「小さな山（テントのような形）」を等間隔に並べます。 2. 反応する場所: - ゴール正面にある「山A」は、シュートが正面から打たれたときだけ高い値を出します。 - サイドにある「山B」は、サイドから打たれたときだけ反応します。</p>
+<p>合成: これらの「山（部品）」をそれぞれ「どれくらい重視するか（重み）」を掛け合わせて足し算すると、リンク全体の「シュートの危険度マップ」が完成します。 この<strong>「一つ一つの山」が「スプライン基底関数」</strong>です。</p>
+</section>
+<section id="なぜスプラインなのか" class="level4">
+<h4 class="anchored" data-anchor-id="なぜスプラインなのか">3. なぜ「スプライン」なのか？</h4>
+<p>単にエリアを四角く区切る（＝モザイク状にする）だけだと、エリアの境界線で値が突然跳ね上がってしまい、不自然です。</p>
+<p><strong>「スプライン」</strong> という手法を使うと、隣り合う「山」同士が滑らかに重なり合うように設計されます。これにより</p>
+<ul>
+<li>「ここから急にゴールしやすくなる」という不自然な段差がなくなる。</li>
+<li><strong>「ゴールに近づくにつれて、なだらかに危険度が高まる」</strong> という自然な表現が可能になる。</li>
+</ul>
+</section>
+<section id="splinetransformer-がやっていること" class="level4">
+<h4 class="anchored" data-anchor-id="splinetransformer-がやっていること">4. SplineTransformer がやっていること</h4>
+<p>コードにある以下の処理は、まさにこの「部品への変換」を行っています。</p>
+<pre><code># 座標 (x, y) を、複数の「山の反応度」に変換する
+basis_spatial = spline.fit_transform(df_small[["xCordAdjusted", "yCordAdjusted"]])</code></pre>
+<ul>
+<li>入力: [x座標, y座標] （2つの数字）</li>
+<li>出力: [山Aの反応, 山Bの反応, 山Cの反応, …] （多くの数字の列）</li>
+</ul>
+<p>の変換のおかげで、あとの統計モデル（PyMC）は「座標から直接計算する」という難しいことをしなくて済み、 <strong>「どの山の重みを大きくすれば、実際のゴール率と一致するか？」</strong> を計算するだけで済むようになります。</p>
+</section>
+<section id="まとめ" class="level4">
+<h4 class="anchored" data-anchor-id="まとめ">まとめ</h4>
+<p><strong>スプライン基底関数</strong>とは、 複雑な空間の形を捉えるために、<strong>「滑らかに重なり合った、場所ごとの反応パーツ」</strong>に分解して表現する手法のことです。</p>
+<p><code>SplineTransformar(n_knots=5, degree=3, include_bias=False)</code></p>
+<p>sciket-learn で提供されている、数値データ。今回は、座標から「スプライン基底関数」と呼ばれる特徴量を生成。</p>
+<p>Args: &gt; <code>n_konots=5</code> (ノットの数) &gt; ノット（データを分割する「結び目（ノット」））の数。 &gt; スプライン曲線は、データをいくつかの区間に分けて、それぞれの区間で多項式を当てはめます。 &gt; この値を大きくするほど、より細かく複雑な形状（曲面）を表現できるようになりますが、 &gt; 大きくしすぎると過学習（ノイズに反応しすぎること）のリスクが高まります。</p>
+<blockquote class="blockquote">
+<p>degree=3 (多項式の次数) 各区間で使用する多項式の次数。 - degree=1: 線形（カクカクした折れ線） - degree=2: 2次関数（放物線） - degree=3: 3次関数（立方スプライン）</p>
+<p>このコードでは: 一般的に最もよく使われる 3（3次スプライン） が指定されています。 これにより、結び目の境界でも変化が非常に滑らか（数学的に2回微分可能）な曲面を作ることができます。</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>include_b=False (バイアス項を含めるか) 全ての基底の和が 1 になるような定数項（インターセプト）を特徴量に含めるかどうか。 True にすると、生成される行列に「常に 1 となる列」のような定数成分が含まれます。 このコードでは: False に設定されています。 これは、後続の統計モデル（PyMCなど）側で別途切片（Intercept）を用意する場合や、 冗長な変数を避けるためによく取られる設定です。</p>
+</blockquote>
+</section>
+</section>
+</section>
+<section id="確率モデル構築modeling" class="level2">
+<h2 class="anchored" data-anchor-id="確率モデル構築modeling">3. 確率モデル構築（Modeling）</h2>
+<p>「場所の難易度」と「キーパーの実力」を統計的に分離して推定します。</p>
+<div id="17660734282181ef" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:20.887593Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:20.855214Z&quot;}" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PyMC用の Coords(座標)定義</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"goalie"</span>: [id_to_name[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(uniques_goalie))],</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shot"</span>: np.arange(<span class="bu">len</span>(df_small)),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"basis"</span>: np.arange(basis_spatial.shape[<span class="dv">1</span>])</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>確率変数の各次元に対してラベルを付与します。 後で可視化や結果を確認する際に人間が理解しやすいようにします。</p>
+<div id="874dec3c2d5e5d35" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:21.240356Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:21.126361Z&quot;}" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> hockey_spatial_model:</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- データ登録(pm.Data: モデル内で参照する固定データ) ---</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    x_basis <span class="op">=</span> pm.Data(<span class="st">"x_basis"</span>, basis_spatial, dims<span class="op">=</span>(<span class="st">"shot"</span>, <span class="st">"basis"</span>))  <span class="co"># 空間特徴量（スプライン基底行列）</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    idx_goalie <span class="op">=</span> pm.Data(<span class="st">"idx_goalie"</span>, df_small[<span class="st">"idx_goalie"</span>], dims<span class="op">=</span><span class="st">"shot"</span>)  <span class="co"># 各シュートの担当GKインデックス</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    obs_shot <span class="op">=</span> pm.Data(<span class="st">"obs_shots"</span>, df_small[<span class="st">"obs_shots"</span>], dims<span class="op">=</span><span class="st">"shot"</span>)  <span class="co"># 正解ラベル（ゴールしたか否か）</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- 空間効果 (Spatial Component: 場所によるはいりやすさの共通トレンド) ---</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    coeffs_spatial <span class="op">=</span> pm.Normal(<span class="st">"coeffs_spatial"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"basis"</span>)  <span class="co"># 各場所（基底）に対する重み係数</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    trend_spatial <span class="op">=</span> pm.Deterministic(<span class="st">"trend_spatial"</span>, pm.math.dot(x_basis, coeffs_spatial),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                                     dims<span class="op">=</span><span class="st">"shot"</span>)  <span class="co"># 場所による「決まりやすさ」のトレンド（線形結合）</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 階層構造 (Hierarchical Component: 人の実力)</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    mu_league <span class="op">=</span> pm.Normal(<span class="st">"mu_league"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">1.5</span>)  <span class="co"># リーグ全体の平均防御力</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    sigma_goalie <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma_goalie"</span>, sigma<span class="op">=</span><span class="fl">0.5</span>)  <span class="co"># リーグ全体の実力格差（ばらつき）</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    z_goalie_offset <span class="op">=</span> pm.Normal(<span class="st">"z_goalie_offset"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"goalie"</span>)  <span class="co"># 各GKの偏差値（標準化された個体差</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- ゴテンダー個別の実力値 (Non-centered Parameterization) ---</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    effect_goalie <span class="op">=</span> pm.Deterministic(<span class="st">"effect_goalie"</span>, mu_league <span class="op">+</span> z_goalie_offset <span class="op">*</span> sigma_goalie, dims<span class="op">=</span><span class="st">"goalie"</span>)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- 結合と尤度 (Likelihood: 答え合わせ) ---</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    p_logit <span class="op">=</span> trend_spatial <span class="op">+</span> effect_goalie[idx_goalie]  <span class="co"># 対数オッズ（場所の効果 + 人の効果）</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    xG <span class="op">=</span> pm.Deterministic(<span class="st">"xG"</span>, pm.math.invlogit(p_logit), dims<span class="op">=</span><span class="st">"shot"</span>)  <span class="co"># 確率（0~1）への変換 = 期待ゴール率</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ベルヌーイ分布で観測データと比較し、パラメータを推論</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>    pm.Bernoulli(<span class="st">"obs"</span>, logit_p<span class="op">=</span>p_logit, observed<span class="op">=</span>obs_shot, dims<span class="op">=</span><span class="st">"shot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="bc2cdf6173c60933" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:21.683173Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:21.336888Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 確率モデル構造の可視化</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(hockey_spatial_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+<figure class="figure">
+<p><img src="hockey_spatial_analysis_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="確率モデル構造の解読graphviz-の見方" class="level3">
+<h3 class="anchored" data-anchor-id="確率モデル構造の解読graphviz-の見方">確率モデル構造の解読（Graphviz の見方）</h3>
+<p>モデルは大きく「左・右・下」の3つのブロックで構成されています。</p>
+<section id="左側空間効果spatial-component" class="level4">
+<h4 class="anchored" data-anchor-id="左側空間効果spatial-component">1. 左側：空間効果（Spatial Component）</h4>
+<p>シュートが放たれた「場所」の有利・不利を計算するルートです。</p>
+<ul>
+<li><strong>x_basis (Data) <span class="math inline">\(\rightarrow\)</span> trend_spatial (Deterministic)</strong>
+<ul>
+<li><code>x_basis</code>（12次元のスプライン基底）に、推定された重み <code>coeffs_spatial</code> を掛け合わせることで、リンク上の各地点の「決まりやすさの基準値」を算出します。</li>
+</ul></li>
+<li><strong>役割</strong>:
+<ul>
+<li>「ゴール正面は決まりやすく、端は決まりにくい」という<strong>物理的なコンテキスト</strong>を司ります。これにより、キーパーの実力評価から「場所の有利不利」というノイズを排除できます。</li>
+</ul></li>
+</ul>
+</section>
+<section id="右側ゴテンダーの実力goalie-hierarchy" class="level4">
+<h4 class="anchored" data-anchor-id="右側ゴテンダーの実力goalie-hierarchy">2. 右側：ゴテンダーの実力（Goalie Hierarchy）</h4>
+<p>各キーパーの阻止能力を推定するルートです。ここには <strong>NCP（非中心化パラメータ化）</strong> という高度な階層構造が組み込まれています。</p>
+<ul>
+<li><strong>最上流 (<code>mu_league</code>, <code>sigma_goalie</code>)</strong>:
+<ul>
+<li>リーグ全体の「平均的な防御力」と「実力差のバラつき」です。</li>
+</ul></li>
+<li><strong>中流 (<code>z_goalie_offset</code>)</strong>:
+<ul>
+<li>各キーパーの「平均からのズレ」を標準化した数値（偏差値のようなもの）です。</li>
+</ul></li>
+<li><strong>下流 (<code>effect_goalie</code>)</strong>:
+<ul>
+<li>上記を統合し、<span class="math inline">\(\mu + z \cdot \sigma\)</span> の計算によって各キーパーの真の実力を復元します。</li>
+</ul></li>
+<li><strong>役割</strong>:
+<ul>
+<li>データが少ないキーパーの評価をリーグ平均に引き寄せ（<strong>収縮推定</strong>）、<strong>「たまたま数回止めただけ」の選手を過大評価するリスク</strong>を統計的に防ぎます。</li>
+</ul></li>
+</ul>
+</section>
+<section id="下部観測データとの結合likelihood" class="level4">
+<h4 class="anchored" data-anchor-id="下部観測データとの結合likelihood">③ 下部：観測データとの結合（Likelihood）</h4>
+<p>予測と現実を突き合わせ、モデルを学習させる心臓部です。</p>
+<ul>
+<li><strong>p_logit <span class="math inline">\(\rightarrow\)</span> xG <span class="math inline">\(\rightarrow\)</span> obs (Observed)</strong>
+<ul>
+<li><code>trend_spatial</code>（場所の影響）と <code>effect_goalie</code>（人の能力）の和が <code>p_logit</code>（対数オッズ）となり、それを確率に直したものが <code>xG</code>（期待ゴール率）です。</li>
+<li>最後に、実際のゴール成否 <code>obs</code> と比較されます。</li>
+</ul></li>
+<li><strong>役割</strong>:
+<ul>
+<li>現実のデータ（<code>obs</code>）との誤差が最小になるように、矢印を逆流する形で全てのパラメータ（白ノード）の値が微調整（サンプリング）されます。</li>
+</ul></li>
+</ul>
+<blockquote class="blockquote">
+<h5 id="tips-確率モデル構造図dagの読み解きガイド" class="anchored">Tips: 確率モデル構造図（DAG）の読み解きガイド</h5>
+<p>グラフ内の各要素は、統計学的な役割を「色」と「形」で表現しています。</p>
+<h6 id="ノード枠の色が表すものデータの確定度" class="anchored">1. ノード（枠）の「色」が表すもの：データの確定度</h6>
+<ul>
+<li><strong>グレー（塗りつぶし）: 観測データ / 固定値</strong>
+<ul>
+<li>外界から与えられた、モデルが変更することのない「事実（<code>pm.Data</code> や <code>observed</code>）」です。すべての推論はこの数値を土台に開始されます。</li>
+</ul></li>
+<li><strong>白（背景なし）: 未知の変数 / 推定対象</strong>
+<ul>
+<li>モデルがデータから正体を突き止めようとしている数値です。ここが「白」であることは、その値が不確実であり、推論が必要であることを意味します。</li>
+</ul></li>
+</ul>
+<h6 id="ノード枠の形が表すもの変数の性質" class="anchored">2. ノード（枠）の「形」が表すもの：変数の性質</h6>
+<ul>
+<li><strong>楕円（白い丸枠）: 確率変数（Stochastic Variables）</strong>
+<ul>
+<li><strong>定義</strong>: <code>Normal</code> や <code>HalfNormal</code> といった統計分布を持つ変数です。</li>
+<li><strong>役割</strong>: サンプリング（MCMC）によって、その値の分布（もっともらしい範囲）が推定される「モデルの核心」となる変数です。</li>
+</ul></li>
+<li><strong>四角形（白い四角枠 / 二重線）: 決定論的変数（Deterministic Variables）</strong>
+<ul>
+<li><strong>定義</strong>: 他のノードからの計算（足し算や行列掛け算など）によって一意に決まる変数です。</li>
+<li><strong>役割</strong>: それ自体がランダムに変動するわけではなく、計算結果に「GSAx」や「空間トレンド」といった名前（ラベル）を付けて解釈しやすくするために存在します。</li>
+</ul></li>
+</ul>
+<h6 id="プレート外側の大きな四角枠" class="anchored">3. プレート（外側の大きな四角枠）</h6>
+<ul>
+<li><strong>意味: 反復処理の範囲（Plate）</strong>
+<ul>
+<li>枠の右下にある数字は、その中の計算が何回繰り返されるかを示します。</li>
+<li><strong>shot プレート (500)</strong>: 全500件のシュート1件ずつに対して、個別に期待値を計算している領域。</li>
+<li><strong>goalie プレート (N)</strong>: キーパーの人数分だけ、個別の実力パラメータを用意している領域。</li>
+</ul></li>
+</ul>
+<h6 id="矢印有向エッジ" class="anchored">4. 矢印（有向エッジ）</h6>
+<ul>
+<li><strong>意味: 依存関係 / 因果の流れ</strong>
+<ul>
+<li>「A の値が B の計算に使われる」という情報の流れを示します。矢印を遡ることで、ある結果が「場所の影響」なのか「個人の実力」なのか、どの因拠に基づいているかを特定できます。</li>
+</ul></li>
+</ul>
+</blockquote>
+</section>
+</section>
+<section id="この構造がビジネスにもたらす価値" class="level3">
+<h3 class="anchored" data-anchor-id="この構造がビジネスにもたらす価値">この構造がビジネスにもたらす価値</h3>
+<p>このグラフをステークホルダーに見せることは、単なる技術説明以上の意味を持ちます。</p>
+<ul>
+<li><strong>「公平な評価」の可視化</strong>:
+<ul>
+<li>場所の影響（左）と個人の能力（右）が別々のルートで計算され、最後に合流していることを示せます。これは、<strong>「厳しい状況で守っているキーパーを正当に評価している」</strong>というロジックの証明です。</li>
+</ul></li>
+<li><strong>ホワイトボックス化による信頼</strong>:
+<ul>
+<li>「なぜその評価になったのか」を、この図に沿って説明できます。「この <code>sigma_goalie</code> という機能がノイズを抑制しているから、新人の評価も安全に行えるのです」といった、専門的な説得が可能になります。</li>
+</ul></li>
+<li><strong>拡張性の提示</strong>:
+<ul>
+<li>例えば「シュートの強さ」を追加したい場合は、左側の枝に新しいノードを足せばよいことが一目でわかります。モデルの成長ロードマップを共有する際の地図になります。</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="推論とモデル診断diagnostics" class="level2">
+<h2 class="anchored" data-anchor-id="推論とモデル診断diagnostics">4. 推論とモデル診断（Diagnostics）</h2>
+<p>推論を実行し、計算が正しく収束し、モデルが信頼できる状態であることを証明します。</p>
+<div id="418b7256c1431846" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:22.388178Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:21.774741Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>PATH_TRACE <span class="op">=</span> <span class="st">"inference_hockey_spatial.nc"</span>  <span class="co"># 推論結果を保存するファイル名</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(PATH_TRACE):</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 保存されたファイルがある場合はロード</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Inference: Checked for existing inference results. Loading from </span><span class="sc">{</span>PATH_TRACE<span class="sc">}</span><span class="ss">."</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    inference <span class="op">=</span> az.from_netcdf(PATH_TRACE)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ファイルがない場合のみ推論を実行</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Inference: No inference results found, so we will start sampling. This may take a few minutes."</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> hockey_spatial_model:</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ターゲット受容率を高めに設定し、安定性を確保</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        inference <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, target_accept<span class="op">=</span><span class="fl">0.95</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 結果を NetCDF 形式で保存（永続化）</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    inference.to_netcdf(PATH_TRACE)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Inference: Inference completed and results saved to </span><span class="sc">{</span>PATH_TRACE<span class="sc">}</span><span class="ss">."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference: Checked for existing inference results. Loading from inference_hockey_spatial.nc.</code></pre>
+</div>
+</div>
+<div id="e0089fb36f507366" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:22.516254Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:22.404069Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 収束診断</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> az.summary(inference, var_names<span class="op">=</span>[<span class="st">"mu_league"</span>, <span class="st">"sigma_goalie"</span>])</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>r_hat_max <span class="op">=</span> summary[<span class="st">"r_hat"</span>].<span class="bu">max</span>()</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>display(summary)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagnostics: Max r_hat = </span><span class="sc">{</span>r_hat_max<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">sd</th>
+<th data-quarto-table-cell-role="th">hdi_3%</th>
+<th data-quarto-table-cell-role="th">hdi_97%</th>
+<th data-quarto-table-cell-role="th">mcse_mean</th>
+<th data-quarto-table-cell-role="th">mcse_sd</th>
+<th data-quarto-table-cell-role="th">ess_bulk</th>
+<th data-quarto-table-cell-role="th">ess_tail</th>
+<th data-quarto-table-cell-role="th">r_hat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">mu_league</td>
+<td>-2.829</td>
+<td>0.646</td>
+<td>-4.018</td>
+<td>-1.592</td>
+<td>0.007</td>
+<td>0.007</td>
+<td>7615.0</td>
+<td>6261.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">sigma_goalie</td>
+<td>0.293</td>
+<td>0.214</td>
+<td>0.000</td>
+<td>0.668</td>
+<td>0.003</td>
+<td>0.002</td>
+<td>4414.0</td>
+<td>3784.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Diagnostics: Max r_hat = 1.0000</code></pre>
+</div>
+</div>
+<section id="hatr-r-hat-指標" class="level3">
+<h3 class="anchored" data-anchor-id="hatr-r-hat-指標"><span class="math inline">\(\hat{R}\)</span> (R-hat) 指標</h3>
+<p><strong>数値</strong> : すべてのパラメータにおいて、値が 1.00 になっています。</p>
+<p><strong>解釈</strong> : <span class="math inline">\(\hat{R}\)</span> は「チェーン間のばらつき」と「チェーン内のばらつき」を比較する指標です。 一般に 1.1 未満（厳密には 1.05 未満）であれば収束したとみなされます。 今回の結果は、全て 1.00 に極めて近いため、複数の独立した試行（チェーン）がすべて同じ統計的結論に達していることを意味します。</p>
+<div id="a65e877dde70a5f" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:23.768769Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:22.741954Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 収束結果の可視化</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(inference, var_names<span class="op">=</span>[<span class="st">"mu_league"</span>, <span class="st">"sigma_goalie"</span>], compact<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hockey_spatial_analysis_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="トレースプロットの形状fuzzy-caterpillar" class="level4">
+<h4 class="anchored" data-anchor-id="トレースプロットの形状fuzzy-caterpillar">トレースプロットの形状（Fuzzy Caterpillar）</h4>
+<p>各チェーン（異なる色の線）が互いにしっかりと混ざり合い、特定の傾向（右肩上がりや下がり）を持たず、一定の範囲を細かく上下に振動しています。 これがいわゆる「毛虫（Fuzzy Caterpillar）」のような状態であり、サンプラーが事後分布の全体を効率よく探索できていることを示します。 特定の場所で停滞したり、チェーンごとに大きく値が離れたりしていないため、良好な収束のサインになります。</p>
+<p>よって、問題なく推論できていると判断できます。</p>
+</section>
+</section>
+</section>
+<section id="戦略的評価３層フィルタリング" class="level2">
+<h2 class="anchored" data-anchor-id="戦略的評価３層フィルタリング">5. 戦略的評価（３層フィルタリング）</h2>
+<section id="第１層-hdi統計的実装" class="level4">
+<h4 class="anchored" data-anchor-id="第１層-hdi統計的実装">第１層: HDI（統計的実装）</h4>
+<p>実力が運ではなく、統計的に見てリーグ平均を超えているかを検証します。</p>
+<div id="48b23460c3a98b05" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:26.297446Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:23.887674Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> privacy_utils <span class="im">import</span> obfuscate_name  <span class="co"># 名前を匿名化</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># GSAx を算出（１試合 30シュートあたりに正規化）</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>samples_xg <span class="op">=</span> inference.posterior[<span class="st">"xG"</span>].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="bu">len</span>(df_small))</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>actual_goals <span class="op">=</span> df_small[<span class="st">"obs_shots"</span>].values</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>list_goalie_gsax <span class="op">=</span> []</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx_g <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(uniques_goalie)):</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> (df_small[<span class="st">"idx_goalie"</span>] <span class="op">==</span> idx_g)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># GSAx = Σ(xG) - Σ(Actual)</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    dist_gsax <span class="op">=</span> (samples_xg[:, mask].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">-</span> actual_goals[mask].<span class="bu">sum</span>()) <span class="op">/</span> (mask.<span class="bu">sum</span>() <span class="op">/</span> <span class="dv">30</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    list_goalie_gsax.append(dist_gsax)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co"># データの集計とソート準備</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 各ゴテンダーの「名前」「分布」「平均値」をセットにしてまとめます。</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>data_goalie_ranking <span class="op">=</span> []</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx_g, dist <span class="kw">in</span> <span class="bu">enumerate</span>(list_goalie_gsax):</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    data_goalie_ranking.append({</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: id_to_name[idx_g],</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dist"</span>: dist,</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mean"</span>: dist.mean()</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 平均値（Mean GSAx）で昇順にソート</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_forest は「下から上」に向かって描画されるため、昇順にソートすることで一番上が「最高成績」になります</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>data_goalie_ranking.sort(key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"mean"</span>], reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="co"># ArivZ に渡すための「名前付き辞書」を作成</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a><span class="co"># このキー（名前）が縦軸のラベルとして採用されます。</span></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a><span class="co"># obfuscate_name() で選手名を匿名化しています。関数定義については GitHub をご参考下さい。</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>dict_plot <span class="op">=</span> {obfuscate_name(item[<span class="st">"name"</span>]): item[<span class="st">"dist"</span>] <span class="cf">for</span> item <span class="kw">in</span> data_goalie_ranking}</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a><span class="co"># HDI の可視化</span></span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>az.plot_forest(dict_plot,</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>               hdi_prob<span class="op">=</span><span class="fl">0.94</span>,</span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>               combined<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>               figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="bu">max</span>(<span class="dv">8</span>, <span class="bu">len</span>(uniques_goalie) <span class="op">*</span> <span class="fl">0.4</span>))</span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>               )</span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 背景のゾーンを色分け ---</span></span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 現在のグラフの表示範囲を取得</span></span>
+<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>xmin, xmax <span class="op">=</span> plt.xlim()</span>
+<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>limit <span class="op">=</span> <span class="bu">max</span>(<span class="bu">abs</span>(xmin), <span class="bu">abs</span>(xmax))  <span class="co"># 0 を中心にバランスをとるために設定</span></span>
+<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>plt.axvspan(<span class="op">-</span>limit, <span class="dv">0</span>, color<span class="op">=</span>COLOR_RED, alpha<span class="op">=</span><span class="fl">0.1</span>, label<span class="op">=</span><span class="st">"Underperforming Zone"</span>)  <span class="co"># マイナスエリア: 赤</span></span>
+<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>plt.axvspan(<span class="dv">0</span>, limit, color<span class="op">=</span>COLOR_GREEN, alpha<span class="op">=</span><span class="fl">0.1</span>, label<span class="op">=</span><span class="st">"Overperforming Zone"</span>)</span>
+<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, color<span class="op">=</span>COLOR_YELLOW, linestyle<span class="op">=</span><span class="st">"-"</span>, linewidth<span class="op">=</span><span class="fl">2.5</span>, label<span class="op">=</span><span class="st">"League Average"</span>)  <span class="co"># 境界線</span></span>
+<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a>plt.axvspan(<span class="op">-</span><span class="fl">0.05</span>, <span class="fl">0.05</span>, color<span class="op">=</span>COLOR_GRAY, alpha<span class="op">=</span><span class="fl">0.2</span>, label<span class="op">=</span><span class="st">"ROPE (Error Margin)"</span>)</span>
+<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a><span class="co"># グラフの装飾</span></span>
+<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Goalie Performance Ranking: GSAx per 30 Shots"</span>, fontsize<span class="op">=</span><span class="dv">16</span>, pad<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb26-52"><a href="#cb26-52" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Goals Saved Above Expected (GSAx)"</span>)</span>
+<span id="cb26-53"><a href="#cb26-53" aria-hidden="true" tabindex="-1"></a>plt.grid(axis<span class="op">=</span><span class="st">"x"</span>, linestyle<span class="op">=</span><span class="st">":"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb26-54"><a href="#cb26-54" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb26-55"><a href="#cb26-55" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hockey_spatial_analysis_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="hdihighest-density-interval" class="level4">
+<h4 class="anchored" data-anchor-id="hdihighest-density-interval">HDI(Highest Density Interval)</h4>
+<p>事後分布において、最も確率密度が高い範囲(94%)になります。 紫のバーが各選手の「実力はこの範囲に収まると 94% の自信を持って言える」というエラーバーになります。バー全体が 0 を超えていれば、その選手の成果は高いと言える可能性が高いと解釈できます。</p>
+<blockquote class="blockquote">
+<h4 id="tips" class="anchored">Tips</h4>
+<p>各選手の HDI の平均値順にソートし、リーグ全体の平均値(黄色の縦線) を境界線としてエリア分けをしています。</p>
+<p>Green ゾーンに HDI がある選手: チームに貯金を作っている選手。統計的な確信を持って「獲得/維持すべき」という判断基準を与えることができます。</p>
+<p>Red ゾーンに HDI がある選手: 期待以上にゴールを許してしまっている選手。小規模データゆえ「たまたま不調」の可能性もありますが、現状の戦力外リスクとして注視すべきという情報を統計的な観点から与えることができます。</p>
+<p>Yellowライン: リーグ平均の壁になります。ここを基準に左右どれだけ離れられるか、が選手の市場価値評価の鍵となります。</p>
+</blockquote>
+</section>
+<section id="第２層-rope実質的評価" class="level3">
+<h3 class="anchored" data-anchor-id="第２層-rope実質的評価">第２層: ROPE（実質的評価）</h3>
+<p>統計的な差異が、ビジネス上のインパクトを伴う「意味のある差」であるかを判定します。 各選手の分析結果（平均貢献度、傑出確率、判定ステータス）を構造化された表形式に変換し、外部ファイルとして永続化します。</p>
+<div id="18198cd0364d28a2" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:26.481090Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:26.432157Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ROPE_THRESHOLD <span class="op">=</span> <span class="fl">0.05</span>  <span class="co"># ±0.05点以内は実務上の誤差とみなす</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>results_rope <span class="op">=</span> []  <span class="co"># 分析結果を格納するリストの準備</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, dist <span class="kw">in</span> <span class="bu">enumerate</span>(list_goalie_gsax):</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    mean_gsax <span class="op">=</span> dist.mean()</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    prob_above_rope <span class="op">=</span> (dist <span class="op">&gt;</span> ROPE_THRESHOLD).mean()</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mean_gsax <span class="op">&gt;</span> ROPE_THRESHOLD:</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        status <span class="op">=</span> <span class="st">"Beyond ROPE (Outstanding)"</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> mean_gsax <span class="op">&lt;</span> <span class="op">-</span>ROPE_THRESHOLD:</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>        status <span class="op">=</span> <span class="st">"Below ROPE (Poor)"</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        status <span class="op">=</span> <span class="st">"Inside ROPE (Equivalent)"</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># リストに追加</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    results_rope.append({</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Coalie"</span>: obfuscate_name(id_to_name[i]),  <span class="co"># 選手名を匿名化</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Mean_GSAx"</span>: <span class="bu">round</span>(mean_gsax, <span class="dv">3</span>),</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Outstanding_Prob"</span>: <span class="bu">round</span>(prob_above_rope <span class="op">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Status"</span>: status</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="co"># DataFrame の作成とソート（貢献度順）</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>df_rope_analysis <span class="op">=</span> pd.DataFrame(results_rope).sort_values(by<span class="op">=</span><span class="st">"Mean_GSAx"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>df_rope_analysis</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Coalie</th>
+<th data-quarto-table-cell-role="th">Mean_GSAx</th>
+<th data-quarto-table-cell-role="th">Outstanding_Prob</th>
+<th data-quarto-table-cell-role="th">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">62</td>
+<td>A. K.</td>
+<td>2.847</td>
+<td>100.0</td>
+<td>Beyond ROPE (Outstanding)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">64</td>
+<td>V. H.</td>
+<td>2.757</td>
+<td>100.0</td>
+<td>Beyond ROPE (Outstanding)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">73</td>
+<td>J. H.</td>
+<td>2.735</td>
+<td>100.0</td>
+<td>Beyond ROPE (Outstanding)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">69</td>
+<td>J. S.</td>
+<td>2.706</td>
+<td>100.0</td>
+<td>Beyond ROPE (Outstanding)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">39</td>
+<td>D. R.</td>
+<td>2.667</td>
+<td>100.0</td>
+<td>Beyond ROPE (Outstanding)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">50</td>
+<td>P. M.</td>
+<td>-5.048</td>
+<td>0.5</td>
+<td>Below ROPE (Poor)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">36</td>
+<td>S. M.</td>
+<td>-5.944</td>
+<td>0.1</td>
+<td>Below ROPE (Poor)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>A. F.</td>
+<td>-6.085</td>
+<td>0.3</td>
+<td>Below ROPE (Poor)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">37</td>
+<td>E. M.</td>
+<td>-6.390</td>
+<td>0.3</td>
+<td>Below ROPE (Poor)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>J. D.</td>
+<td>-8.300</td>
+<td>0.0</td>
+<td>Below ROPE (Poor)</td>
+</tr>
+</tbody>
+</table>
+
+<p>79 rows × 4 columns</p>
+</div>
+</div>
+</div>
+<section id="戦略的解釈rope分析を通じた意思決定" class="level4">
+<h4 class="anchored" data-anchor-id="戦略的解釈rope分析を通じた意思決定">戦略的解釈：ROPE分析を通じた意思決定</h4>
+<p>実ショットデータ 500 件に基づく、全 79 名のゴテンダーを対象とした ROPE（実質的等価領域）分析の結果を解釈します。この分析では、単なる平均値ではなく、場所の難易度を考慮した上での「真の貢献度」を評価しています。</p>
+<section id="分析結果のサマリー" class="level5">
+<h5 class="anchored" data-anchor-id="分析結果のサマリー">分析結果のサマリー</h5>
+<p>全 79 名の分布は以下の通りです。</p>
+<ul>
+<li><strong>Beyond ROPE (Outstanding): 55名</strong>
+<ul>
+<li>統計的誤差を超えて、明らかにリーグ平均以上の価値を提供している選手。</li>
+</ul></li>
+<li><strong>Below ROPE (Poor): 23名</strong>
+<ul>
+<li>統計的誤差を超えて、期待値以上の失点を許している、改善が必要な選手。</li>
+</ul></li>
+<li><strong>Inside ROPE (Equivalent): 1名 (F. G. 選手)</strong>
+<ul>
+<li>数値上はプラスですが、実務上は「リーグ平均と等価」とみなすべき選手。</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="注目選手の詳細分析" class="level4">
+<h4 class="anchored" data-anchor-id="注目選手の詳細分析">注目選手の詳細分析</h4>
+<section id="トップパフォーマーa.-k.-v.-h.-j.-h.-選手" class="level5">
+<h5 class="anchored" data-anchor-id="トップパフォーマーa.-k.-v.-h.-j.-h.-選手">1. トップパフォーマー：A. K., V. H., J. H. 選手</h5>
+<ul>
+<li><strong>平均 <span class="math inline">\(GSAx\)</span> (2.7 〜 2.8)</strong>: 1試合（30シュート想定）あたり、平均的なキーパーよりも <strong>約 2.7 点以上多く防いでいます</strong>。</li>
+<li><strong>傑出確率(100.0%)</strong>: 彼らが「本物」である確率は 100% と推定され、運ではなく実力であることが統計的に断定されています。</li>
+<li><strong>ビジネス判断</strong>: 市場価値が急騰する前に確保すべき「最優先資産」です。</li>
+</ul>
+</section>
+<section id="ボーダーラインf.-g.-選手-inside-rope" class="level5">
+<h5 class="anchored" data-anchor-id="ボーダーラインf.-g.-選手-inside-rope">2. ボーダーライン：F. G. 選手 (Inside ROPE)</h5>
+<ul>
+<li><strong>平均 <span class="math inline">\(GSAx\)</span> (0.005)</strong>: プラスの数値ではありますが、ROPE（<span class="math inline">\(\pm 0.05\)</span>）の範囲内です。</li>
+<li><strong>ビジネス判断</strong>: 現時点では「平均的な選手」と能力の差が認められません。高額な契約を提示するにはリスクが伴います。</li>
+</ul>
+</section>
+<section id="ボトムパフォーマーj.-d.-e.-m.-選手" class="level5">
+<h5 class="anchored" data-anchor-id="ボトムパフォーマーj.-d.-e.-m.-選手">3. ボトムパフォーマー：J. D., E. M. 選手</h5>
+<ul>
+<li><strong>平均 <span class="math inline">\(GSAx\)</span> (-8.3 〜 -6.3)</strong>: 平均的な選手と比較して、1試合あたり 6〜8 点分多く失点している計算になります。</li>
+<li><strong>ビジネス判断</strong>: 早急な戦力補強、または守備システム自体の抜本的な見直しが必要です。</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="ビジネスアクションプラン" class="level4">
+<h4 class="anchored" data-anchor-id="ビジネスアクションプラン">ビジネス・アクションプラン</h4>
+<ol type="1">
+<li><strong>「隠れた名手」の特定</strong>: チームの勝率が低くても、このリストで <code>Beyond ROPE</code> に入っている選手は、「チームの守備力が低いだけで、個人は極めて優秀」な <strong>割安の優良資産</strong> である可能性が高いです。</li>
+<li><strong>投資対効果の最大化</strong>: <code>Outstanding Prob</code> が高い選手に予算を集中させ、<code>Inside ROPE</code> の選手についてはコストパフォーマンスを厳格に評価します。</li>
+<li><strong>エビデンスに基づく編成会議</strong>: 「なんとなく調子が悪い」といった主観を排除し、この <span class="math inline">\(GSAx\)</span> と <span class="math inline">\(ROPE\)</span> の指標を用いることで、法務・経営陣に対して論理的で透明性の高い編成案を提示できます。</li>
+</ol>
+<div id="1f058913f1a93fd4" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:26.607280Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:26.588736Z&quot;}" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CSVファイルとして保存（ビジネス用補助データ）</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>FILE_OUTPUT <span class="op">=</span> os.path.join(DIR_EXTRACT, <span class="st">"data_goalie_rope_analysis.csv"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>df_rope_analysis.to_csv(FILE_OUTPUT, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>データフレーム化（Tabularization）することで、どの選手が「実質的なプラスの差」を生み出しているかが一目で比較可能になります。また、CSVとしてファイル化しておくことで、「分析環境を持っていない経営層や現場スタッフ」が Excel 等でデータを確認できるようになり、組織全体の意思決定のスピードと質を向上させます。</p>
+</section>
+</section>
+<section id="第３層-roi-経済的評価" class="level3">
+<h3 class="anchored" data-anchor-id="第３層-roi-経済的評価">第３層: ROI (経済的評価)</h3>
+<p>統計的評価を「ビジネスの投資判断」へ昇華させます。 GSAx を金額換算し、さらに「収益がプラスになる確率」と「確信の範囲（94% HDI）」を併記することで、リスクとリターンを一目で把握できる最終報告用の資料を生成します。</p>
+<div id="b0b12a5138ab7203" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:26.855917Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:26.816352Z&quot;}" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 経済価値のパラメータ設定（ビジネスモデルに合わせて調整可能）</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>VALUE_GOAL <span class="op">=</span> <span class="dv">1_000_000</span>  <span class="co"># １ゴールを防ぐ価値 = 100万円</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>ANNUAL_GAMES <span class="op">=</span> <span class="dv">60</span>  <span class="co"># 年間の想定出場試合数</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>results_roi <span class="op">=</span> []</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Layer 3: ROI Assessment calculating..."</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co"># list_goalie_gsax は各選手の「１試合（30本）あたりの GSAx分布」</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, dist <span class="kw">in</span> <span class="bu">enumerate</span>(list_goalie_gsax):</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    profit_expected_annual <span class="op">=</span> dist.mean() <span class="op">*</span> ANNUAL_GAMES <span class="op">*</span> VALUE_GOAL  <span class="co"># 年間の期待合計貢献額</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    prob_profitability <span class="op">=</span> (dist <span class="op">&gt;</span> <span class="dv">0</span>).mean()  <span class="co"># 収益化確率（平均以上の貢献をする確率）</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 94% HDI による収益の確信範囲</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    hdi_lower, hdi_upper <span class="op">=</span> az.hdi(dist, hdi_prob<span class="op">=</span><span class="fl">0.94</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    profit_hdi_lower <span class="op">=</span> hdi_lower <span class="op">*</span> ANNUAL_GAMES <span class="op">*</span> VALUE_GOAL</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    profit_hdi_upper <span class="op">=</span> hdi_upper <span class="op">*</span> ANNUAL_GAMES <span class="op">*</span> VALUE_GOAL</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    results_roi.append({</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Goalie"</span>: obfuscate_name(id_to_name[i]),</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Expected_Annual_Profit"</span>: <span class="bu">int</span>(profit_expected_annual),</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Profitability_Prob"</span>: <span class="bu">round</span>(prob_profitability <span class="op">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Profit_HDI_Lower"</span>: <span class="bu">int</span>(profit_hdi_lower),</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Profit_HDI_Upper"</span>: <span class="bu">int</span>(profit_hdi_upper)</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="co"># DataFrame化とソート</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>df_roi <span class="op">=</span> pd.DataFrame(results_roi).sort_values(by<span class="op">=</span><span class="st">"Expected_Annual_Profit"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>df_roi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Layer 3: ROI Assessment calculating...</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Goalie</th>
+<th data-quarto-table-cell-role="th">Expected_Annual_Profit</th>
+<th data-quarto-table-cell-role="th">Profitability_Prob</th>
+<th data-quarto-table-cell-role="th">Profit_HDI_Lower</th>
+<th data-quarto-table-cell-role="th">Profit_HDI_Upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">62</td>
+<td>A. K.</td>
+<td>170790436</td>
+<td>100.0</td>
+<td>51198446</td>
+<td>297205298</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">64</td>
+<td>V. H.</td>
+<td>165417100</td>
+<td>100.0</td>
+<td>53097600</td>
+<td>279289732</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">73</td>
+<td>J. H.</td>
+<td>164094708</td>
+<td>100.0</td>
+<td>42952293</td>
+<td>286368258</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">69</td>
+<td>J. S.</td>
+<td>162353045</td>
+<td>100.0</td>
+<td>39940961</td>
+<td>289616400</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">39</td>
+<td>D. R.</td>
+<td>159999358</td>
+<td>100.0</td>
+<td>49822147</td>
+<td>268045832</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">50</td>
+<td>P. M.</td>
+<td>-302851857</td>
+<td>0.5</td>
+<td>-397484645</td>
+<td>-195002825</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">36</td>
+<td>S. M.</td>
+<td>-356628658</td>
+<td>0.1</td>
+<td>-426010415</td>
+<td>-280890982</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>A. F.</td>
+<td>-365104667</td>
+<td>0.3</td>
+<td>-453358070</td>
+<td>-245912157</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">37</td>
+<td>E. M.</td>
+<td>-383429912</td>
+<td>0.3</td>
+<td>-479982156</td>
+<td>-251180136</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>J. D.</td>
+<td>-497985072</td>
+<td>0.0</td>
+<td>-572780334</td>
+<td>-404946765</td>
+</tr>
+</tbody>
+</table>
+
+<p>79 rows × 5 columns</p>
+</div>
+</div>
+</div>
+<div id="9472dd0901cf5048" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:27.373690Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:27.363612Z&quot;}" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CSV として保存</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>FILE_ROI <span class="op">=</span> os.path.join(DIR_EXTRACT, <span class="st">"goalie_final_investment_report.csv"</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>df_roi.to_csv(FILE_ROI, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>統計量を「金額」と「リスク幅」に変換し、経営層が直感的に投資判断（契約更新や獲得交渉）を行える形式に可視化します。</p>
+<div id="66c1a81cb45dfdf1" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:28.209976Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:27.529548Z&quot;}" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 最終レポートの可視化（上位15名）</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>df_top <span class="op">=</span> df_roi.head(<span class="dv">15</span>).copy()</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 通貨単位（万円）に変換して見やすくする</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>df_top[<span class="st">"Profit_Million"</span>] <span class="op">=</span> df_top[<span class="st">"Expected_Annual_Profit"</span>] <span class="op">/</span> <span class="dv">10_000</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>df_top[<span class="st">"Lower_Million"</span>] <span class="op">=</span> df_top[<span class="st">"Profit_HDI_Lower"</span>] <span class="op">/</span> <span class="dv">10_000</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>df_top[<span class="st">"Upper_Million"</span>] <span class="op">=</span> df_top[<span class="st">"Profit_HDI_Upper"</span>] <span class="op">/</span> <span class="dv">10_000</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co"># プロット実行</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 期待値のバーチャート</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> plt.barh(df_top[<span class="st">"Goalie"</span>][::<span class="op">-</span><span class="dv">1</span>], df_top[<span class="st">"Profit_Million"</span>][::<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>COLOR_PURPLE, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">"Expected Annual Contribution Studies"</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 不確実性のエラーバー（HDI）</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>plt.errorbar(df_top[<span class="st">"Profit_Million"</span>][::<span class="op">-</span><span class="dv">1</span>], np.arange(<span class="bu">len</span>(df_top)),</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>             xerr<span class="op">=</span>[(df_top[<span class="st">"Profit_Million"</span>] <span class="op">-</span> df_top[<span class="st">"Lower_Million"</span>])[::<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>                   (df_top[<span class="st">"Upper_Million"</span>] <span class="op">-</span> df_top[<span class="st">"Profit_Million"</span>])[::<span class="op">-</span><span class="dv">1</span>]],</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>             fmt<span class="op">=</span><span class="st">"none"</span>, ecolor<span class="op">=</span>COLOR_GRAY, capsize<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="st">"94% HDI (Confidence range)"</span>)</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, color<span class="op">=</span>COLOR_RED, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Final Investment Value Report: Expected Annual Economic Contribution (TOP 15)"</span>, fontsize<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>          fontweight<span class="op">=</span><span class="st">"bold"</span>, pad<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Expected contribution amount (unit: 10,000 yen)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Player"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">"lower right"</span>)</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 値のラベル付け</span></span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(df_top[<span class="st">"Profit_Million"</span>][::<span class="op">-</span><span class="dv">1</span>]):</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    plt.text(v <span class="op">+</span> <span class="dv">50</span>, i, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:,.0f}</span><span class="ss">yen"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span>COLOR_YELLOW)</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>IMG_FINAL_REPORT <span class="op">=</span> os.path.join(DIR_EXTRACT, <span class="st">"final_roi_report_chart.png"</span>)</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>plt.savefig(IMG_FINAL_REPORT, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hockey_spatial_analysis_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>ゴテンダーのパフォーマンスがチームのキャッシュフローに対して億単位のインパクトを与えることを示唆しています。</p>
+<section id="トップ層上位-5-名a.-k.-v.-h.-等の価値" class="level5">
+<h5 class="anchored" data-anchor-id="トップ層上位-5-名a.-k.-v.-h.-等の価値">トップ層（上位 5 名：A. K., V. H. 等）の価値</h5>
+<ul>
+<li><strong>期待収益:</strong> リーグ平均の選手と比較して、年間で 約 1.6 億円 〜 1.7 億円 の損失（失点）を回避する価値があると算出されました。</li>
+<li><strong>解釈:</strong> 彼らに対して 1 億円の年俸を支払ったとしても、なおチームに数千万円の「純利益（失点抑制による勝利への貢献）」をもたらす計算になります。</li>
+</ul>
+<div id="971aaec05e121979" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-28T22:22:28.347485Z&quot;,&quot;start_time&quot;:&quot;2025-12-28T22:22:28.326176Z&quot;}" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_top[[<span class="st">"Goalie"</span>, <span class="st">"Expected_Annual_Profit"</span>, <span class="st">"Profitability_Prob"</span>, <span class="st">"Profit_HDI_Lower"</span>, <span class="st">"Profit_HDI_Upper"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Goalie</th>
+<th data-quarto-table-cell-role="th">Expected_Annual_Profit</th>
+<th data-quarto-table-cell-role="th">Profitability_Prob</th>
+<th data-quarto-table-cell-role="th">Profit_HDI_Lower</th>
+<th data-quarto-table-cell-role="th">Profit_HDI_Upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">62</td>
+<td>A. K.</td>
+<td>170790436</td>
+<td>100.0</td>
+<td>51198446</td>
+<td>297205298</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">64</td>
+<td>V. H.</td>
+<td>165417100</td>
+<td>100.0</td>
+<td>53097600</td>
+<td>279289732</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">73</td>
+<td>J. H.</td>
+<td>164094708</td>
+<td>100.0</td>
+<td>42952293</td>
+<td>286368258</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">69</td>
+<td>J. S.</td>
+<td>162353045</td>
+<td>100.0</td>
+<td>39940961</td>
+<td>289616400</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">39</td>
+<td>D. R.</td>
+<td>159999358</td>
+<td>100.0</td>
+<td>49822147</td>
+<td>268045832</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">44</td>
+<td>J. G.</td>
+<td>139588811</td>
+<td>100.0</td>
+<td>28147238</td>
+<td>254939718</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">34</td>
+<td>I. S.</td>
+<td>138419304</td>
+<td>100.0</td>
+<td>46628693</td>
+<td>223657791</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">12</td>
+<td>C. I.</td>
+<td>137314100</td>
+<td>100.0</td>
+<td>42632083</td>
+<td>228914780</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>J. M.</td>
+<td>136509122</td>
+<td>100.0</td>
+<td>43062664</td>
+<td>227819462</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">31</td>
+<td>J. Q.</td>
+<td>135496606</td>
+<td>100.0</td>
+<td>37540900</td>
+<td>218786598</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">35</td>
+<td>E. C.</td>
+<td>131216185</td>
+<td>100.0</td>
+<td>42877182</td>
+<td>217479135</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">56</td>
+<td>C. P.</td>
+<td>124674332</td>
+<td>100.0</td>
+<td>40466382</td>
+<td>213457998</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">28</td>
+<td>I. S.</td>
+<td>121988835</td>
+<td>100.0</td>
+<td>33182011</td>
+<td>199023392</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">78</td>
+<td>D. C.</td>
+<td>121341191</td>
+<td>100.0</td>
+<td>28310071</td>
+<td>228263486</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>J. B.</td>
+<td>120769854</td>
+<td>100.0</td>
+<td>42119516</td>
+<td>198761783</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Expected_Annual_Profit(推定資産価値):</strong> 予算編成（年俸総額）の基準とする。</li>
+<li><strong>Profitabilly_Prob:</strong> 100%に近い選手は「コアメンバー」として固定。</li>
+<li><strong>Profit_HDI_Range:</strong> 最悪のシナリオ（Lower）でも赤字にならないかを確認。</li>
+</ul>
+<blockquote class="blockquote">
+<h5 id="expected-annual-profit-期待年間貢献額" class="anchored"><strong>Expected Annual Profit (期待年間貢献額)</strong></h5>
+<p>選手が平均的なゴテンダーと比較して、年間（60試合）でどれだけの失点を防ぎ、それを金額換算（1失点=100万円）したものになります。 「この選手を起用することで、チームの損失を何千万円防げるか？」という指標です。</p>
+</blockquote>
+<p>この ROI レポートは、現場（コーチ陣）と経営（フロント）の架け橋になります。 「なぜ彼を獲得するのに 1.5 億円必要なのか？」 という問いに対し、 「彼は場所の難易度を考慮しても年間で 1.7 億円分の失点を防ぐため、実質的に 2,000 万円のプラスを生む投資だからです」 と、科学的根拠（エビデンス）を持って答えられるようになります。</p>
+</section>
+</section>
+<section id="ベイズによるスポーツビジネスの不確実へアプローチ" class="level3">
+<h3 class="anchored" data-anchor-id="ベイズによるスポーツビジネスの不確実へアプローチ">ベイズによるスポーツビジネスの不確実へアプローチ</h3>
+<p>2024年シーズンの実ショットデータを用い、ベイズ階層モデルによるゴテンダーの貢献度評価（GSAx）から、最終的な経済価値（ROI）の算出までを完結させました。 スポーツアナリティクスを題材にあえて小規模データにし「データの少なさ」と「直感への依存」というリスクの中での分析を実行しました。本分析が提示した<strong>アプローチ</strong>で、不確実性を排除するためのユースケースをご提案出来たかと思います。</p>
+<section id="統計的実証hdiによる運の排除" class="level4">
+<h4 class="anchored" data-anchor-id="統計的実証hdiによる運の排除">1. 統計的実証（HDI）による「運」の排除</h4>
+<p>「たまたま数試合調子が良かっただけではないか？」という疑念に対し、<strong>HDI（最高密度区間）</strong> は科学的な回答を与えます。 500件という限られたデータであっても、階層モデルによる「収縮推定（Shrinkage）」を行うことで、過学習を防ぎつつ、選手が持つ真の実力を表現しました。</p>
+</section>
+<section id="実質的評価ropeによるノイズの排除" class="level4">
+<h4 class="anchored" data-anchor-id="実質的評価ropeによるノイズの排除">2. 実質的評価（ROPE）による「ノイズ」の排除</h4>
+<p>数字上の微細な差は、ビジネスにおいての判断を難しくさせます。<strong>ROPE（実質的等価領域）</strong> を導入することで、統計的に有意であっても実務的に意味のない差を「ノイズ」として切り捨て、 投資すべき「対象（Beyond ROPE）」を明確にし判断における有用な情報を提供できました。</p>
+</section>
+<section id="経済的評価roiによる言語の統一" class="level4">
+<h4 class="anchored" data-anchor-id="経済的評価roiによる言語の統一">3. 経済的評価（ROI）による「言語」の統一</h4>
+<p>実際のビジネスの現場では、現場と経営の言葉が通じない状況が発生します。本プロジェクトでは GSAx を<strong>「年間期待経済貢献額（円）」</strong> という通貨単位に翻訳することで</p>
+<blockquote class="blockquote">
+<p><strong>「A. K. 選手は GSAx が高い」</strong>（現場の言葉）</p>
+<p><strong>「A. K. 選手は年間で 1.7 億円の損失を回避する投資価値がある」</strong>（経営の言葉）</p>
+</blockquote>
+<p>という対話が可能になり迅速かつ合理的な予算編成と契約交渉を可能にします。</p>
+</section>
+<section id="倫理的専門的な配慮プライバシーバイデザイン" class="level4">
+<h4 class="anchored" data-anchor-id="倫理的専門的な配慮プライバシーバイデザイン">倫理的・専門的な配慮：プライバシー・バイ・デザイン</h4>
+<p>分析の過程で実施した <strong>「選手名の秘匿化（イニシャル化）」</strong> は、法務リスクの回避に加えて 特定の個人をランク付けして批判するのではなく、「評価システムそのものの妥当性」と「意思決定プロセスの透明性」に焦点をつなげるという利点もあります。</p>
+</section>
+<section id="まとめ-1" class="level4">
+<h4 class="anchored" data-anchor-id="まとめ-1">まとめ</h4>
+<p>ベイズ統計は、<strong>「不確実性を確率として捉え、リスクを許容可能な範囲に収める」</strong> ための良い手段になります。 本分析を通じて示された「科学的な選手評価」は、スポーツビジネスにおける勝率を上げ、持続可能な成長を実現するための基盤構築に繋げることが出来ます。</p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/petalab-io\.github\.io\/bayesian-iroha\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

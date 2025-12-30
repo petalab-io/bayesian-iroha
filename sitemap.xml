@@ -2,10 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/01_web_performance/roi_decision.html</loc>
-    <lastmod>2025-12-22T08:35:49.369Z</lastmod>
+    <lastmod>2025-12-28T04:36:51.550Z</lastmod>
   </url>
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/index.html</loc>
-    <lastmod>2025-12-22T10:12:13.739Z</lastmod>
+    <lastmod>2025-12-30T02:10:55.567Z</lastmod>
+  </url>
+  <url>
+    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/02_hockey_gotender/hockey_spatial_analysis.html</loc>
+    <lastmod>2025-12-29T04:18:23.688Z</lastmod>
   </url>
 </urlset>
