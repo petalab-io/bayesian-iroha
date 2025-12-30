@@ -1,3 +1,9 @@
+---
+title: "Hockey Spatial Analysis: 空間統計による真の資産価値（GSAx）可視化プロジェクト"
+author: "Gemini 3(thinked) with peta"
+data: 2025-12-29
+---
+
 # Hockey Spatial Analysis: 空間統計による真の資産価値（GSAx）可視化プロジェクト
 
 ## 1. 経営課題と分析の目的
