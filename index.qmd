@@ -3,7 +3,8 @@ title: "ベイジアンいろは"
 ---
 
 ## 概要
-小規模データ×階層ベイズでビジネスの勝率を導く「意思決定のいろは」。PyMC v5を用い、単なる有意差検定を超えたROPE/ROI分析によるリスク可視化フレームワークを実装・蓄積するナレッジベース。
+小規模データ×階層ベイズでビジネスの勝率を導く「意思決定のいろは」。PyMC
+v5を用い、単なる有意差検定を超えたROPE/ROI分析によるリスク可視化フレームワークを実装・蓄積するナレッジベース。
 
 ### 分析レポート
 
@@ -12,3 +13,8 @@ title: "ベイジアンいろは"
 #### Web高速化施策のROI分析
 - [プロジェクト概要（README）](notebooks/01_web_performance/README.md)
 - [分析実証ログ（Notebook）](notebooks/01_web_performance/roi_decision.ipynb)
+
+#### 空間統計による真の資産価値（GSAx）可視化プロジェクト
+- [プロジェクト概要（README）](notebooks/02_hockey_gotender/README.md)
+- [分析実証ログ（Notebook）](notebooks/02_hockey_gotender/hockey_spatial_analysis.ipynb)
+- [ヘルパーメソッド定義（Python）](notebooks/02_hockey_gotender/privacy_utils.py)

@@ -11,6 +11,11 @@ website:
         contents:
           - notebooks/01_web_performance/README.md
           - notebooks/01_web_performance/roi_decision.ipynb
+      - section: "spatial model Analysis"
+      - contents:
+          - notebooks/02_hockey_gotender/README.md
+          - notebooks/02_hockey_gotender/hockey_spatial_analysis.ipynb
+          - notebooks/02_hockey_gotender/privacy_utils.py
 
 format:
   html:
