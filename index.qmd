@@ -18,3 +18,7 @@ v5を用い、単なる有意差検定を超えたROPE/ROI分析によるリス�
 - [プロジェクト概要（README）](notebooks/02_hockey_gotender/README.md)
 - [分析実証ログ（Notebook）](notebooks/02_hockey_gotender/hockey_spatial_analysis.ipynb)
 - [ヘルパーメソッド定義（Python）](notebooks/02_hockey_gotender/privacy_utils.py)
+
+#### 階層ベイズ線形回帰によるマルシェ出店地点別の売上予測
+-[プロジェクト概要](notebooks/03_Sales_forecast_by_market_location/README.md)
+- [分析実証ログ](notebooks/03_Sales_forecast_by_market_location/hierarchical_baysian_linear_regression.ipynb)
