@@ -232,7 +232,7 @@ window.Quarto = {
 <p><strong>【分析の背景】</strong> サイト全体の平均LCP改善という表面的な指標に隠れた、決済ページ等の重要ページにおけるパフォーマンス改悪がビジネスに与える損失リスクを評価しました。本分析では、PyMC v5を用いた階層ベイズモデルに加え、ビジネス前提（売上感度）の不確実性を加味した「感度分析」を実行し、意思決定の妥当性を検証しています。</p>
 <p><strong>【主要な発見】</strong> * <strong>期待純利益</strong>: Top/Detailページの改善効果により、全体では約 <strong>8,210万円</strong> の大幅な増収が期待値として算出されました。 * <strong>収益化確率（勝率）</strong>: しかし、全体の収益がプラスになる確率は <strong>65.1%</strong> に留まり、<strong>約3回に1回は赤字になる</strong> という不安定な状態です。 * <strong>潜在的リスクの特定</strong>: 最大の懸念点は「決済ページ（Checkout）」です。このページ単体では <strong>77.4% の確率で1万円以上の損失が発生</strong> しており、Topページの稼いだ利益を食いつぶす明確な「出血点」となっています。</p>
 <p><strong>【最終アクション】</strong> <strong>「条件付きリリース」</strong> を推奨します。全体を一括リリースすることは、Checkoutページのリスク（勝率65%）が高すぎるため却下とします。 リスクの低い <strong>Top/Detail ページの改善のみを部分的にリリース</strong> し、Checkout ページに関しては実装をロールバックまたは修正した後、再検証を行うべきです。</p>
-<div id="initial_id" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:01:10.237621Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:01:08.650241Z&quot;}" data-execution_count="1">
+<div id="initial_id" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.109648Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:00.087416Z&quot;}" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
@@ -248,7 +248,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
   warn(</code></pre>
 </div>
 </div>
-<div id="44deb3e04c7fb9c7" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:01:36.915317Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:01:36.902667Z&quot;}" data-execution_count="2">
+<div id="44deb3e04c7fb9c7" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.135161Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:01.127679Z&quot;}" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># カラー定義</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>COLOR_PURPLE <span class="op">=</span> <span class="st">"#9B5DE5"</span>  <span class="co"># 事後分布・HDI</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>COLOR_YELLOW <span class="op">=</span> <span class="st">"#F9C74F"</span>  <span class="co"># ROPE領域</span></span>
@@ -264,7 +264,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>sns.set_palette([COLOR_PURPLE, COLOR_YELLOW, COLOR_GREEN, COLOR_RED, COLOR_GRAY])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="9bceda6d65a41ddd" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:01:37.844235Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:01:37.835819Z&quot;}" data-execution_count="3">
+<div id="9bceda6d65a41ddd" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.196563Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:01.191243Z&quot;}" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"PyMC version: </span><span class="sc">{</span>pm<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 再現性の確保</span></span>
@@ -274,7 +274,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <pre><code>PyMC version: 5.26.1</code></pre>
 </div>
 </div>
-<div id="ef6bd972ed0e4212" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:01:39.020823Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:01:39.011380Z&quot;}" data-execution_count="4">
+<div id="ef6bd972ed0e4212" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.273021Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:01.263214Z&quot;}" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1. Data の生成 (N=20 小規模Data) ---</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_weighted_scenario_data(n_per_page<span class="op">=</span><span class="dv">20</span>):</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
@@ -303,10 +303,10 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.DataFrame(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="6e3577db526eb2ee" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:01:39.960296Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:01:39.949667Z&quot;}" data-execution_count="5">
+<div id="6e3577db526eb2ee" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.331976Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:01.323760Z&quot;}" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> generate_weighted_scenario_data(n_per_page<span class="op">=</span><span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="23e8f9e7e6e06608" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:01:40.986081Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:01:40.954081Z&quot;}" data-execution_count="6">
+<div id="23e8f9e7e6e06608" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.428028Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:01.393756Z&quot;}" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 基本統計量の確認</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- 基本統計量（Group × Page） ---"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -346,7 +346,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 </div>
 <p>単純に <code>df.groupby("group").agg({"lcp": "mean"})</code> を見ると、Sample数が均等なため - Pre: 3225ms -&gt; Post: 3196ms</p>
 <p>と、全体として大きな変化はありません。</p>
-<div id="9f7783c8a67f1c70" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:02:16.202433Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:02:16.124553Z&quot;}" data-execution_count="7">
+<div id="9f7783c8a67f1c70" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:01.623380Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:01.594715Z&quot;}" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df.groupby([<span class="st">"page"</span>, <span class="st">"group"</span>]).agg({<span class="st">"lcp"</span>: <span class="st">"mean"</span>}).unstack()  <span class="co"># 確認</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># unstack() は、MultiIndex（重層的なインデックス）を持つ Series や DataFrame のインデックスの最下層を、カラム（列）へと展開（ピボット）する効果があります。</span></span>
@@ -401,7 +401,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 </div>
 </div>
 <p><code>Checkout</code> を見ると明確に悪化しています。</p>
-<div id="820258f129637fa7" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:02:35.618650Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:02:33.440405Z&quot;}" data-execution_count="8">
+<div id="820258f129637fa7" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:04.216827Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:02.176663Z&quot;}" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 分布の可視化</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">9</span>))</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ax_flat <span class="op">=</span> axes.flatten()</span>
@@ -440,7 +440,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <section id="非中心化による階層ベイズモデル" class="level4">
 <h4 class="anchored" data-anchor-id="非中心化による階層ベイズモデル">非中心化による階層ベイズモデル</h4>
 <p>N=20のような小規模データで階層モデル（特に分散パラメータ <span class="math inline">\(\sigma\)</span> が小さい場合）を推定すると、MCMCサンプラーが「漏斗（Funnel）のような形状」の確率分布を探索できず、Divergences（発散） というエラーが頻発することがあります。 これはベイズ推論の信頼性を損ってしまう為、回避する為に、変数の依存関係を数式上で切り離す <strong>「非中心化」</strong> テクニックを用います。 - 中心化（Centered）: <span class="math inline">\(\beta \sim \text{Normal}(\mu, \sigma)\)</span> - <span class="math inline">\(\beta\)</span> の値が決まる際、<span class="math inline">\(\mu\)</span> と <span class="math inline">\(\sigma\)</span> に直接依存する。 - 非中心化（Non-centered）: <span class="math inline">\(z \sim \text{Normal}(0, 1)\)</span>, <span class="math inline">\(\beta = \mu + z \cdot \sigma\)</span> - <span class="math inline">\(z\)</span> は標準正規分布から独立に生成され、あとでスケーリングされる。これによりサンプラーがスムーズに空間を移動できる。</p>
-<div id="c277f577c2f7c2a3" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:02:44.651119Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:02:44.641203Z&quot;}" data-execution_count="9">
+<div id="c277f577c2f7c2a3" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:04.616360Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:04.605837Z&quot;}" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>idx_page, pages <span class="op">=</span> pd.factorize(df[<span class="st">"page"</span>])</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>idx_group, groups <span class="op">=</span> pd.factorize(df[<span class="st">"group"</span>])</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -461,7 +461,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <li>非中心化実装の柔軟性 今回のモデルで採用している「非中心化（Non-centered）」モデルでは、標準正規分布からサンプリングした値にズレ（）を掛け合わせる操作を行います。 Coordsがあると、この「ズレ」をどの次元に対して適用するのかを dims=(“page”, “group”) のように名前で指定でき、モデルの構造が非常に読みやすくなります。</li>
 </ol>
 <p>このように、Index化とCoordsの定義は、 <strong>「計算機のための効率化」と「人間のための可読性・解析性」</strong> を両立させるための非常に重要なベストプラクティスです。これを行うことで、将来的にページ数が増えたり、新しいセグメント（デバイス別など）を追加したりする場合も、モデルの拡張が容易になります</p>
-<div id="55aaa494652728b5" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:03:18.901134Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:03:18.833733Z&quot;}" data-execution_count="11">
+<div id="55aaa494652728b5" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:05.086081Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:04.995402Z&quot;}" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model:</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Data Containers ---</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    _idx_page  <span class="op">=</span> pm.Data(<span class="st">"idx_page"</span>, idx_page, dims<span class="op">=</span><span class="st">"id_obs"</span>)</span>
@@ -497,9 +497,9 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    lcp <span class="op">=</span> pm.Lognormal(<span class="st">"lcp"</span>, mu<span class="op">=</span>mu_LCP, sigma<span class="op">=</span>sigma_obs, observed<span class="op">=</span>_obs_lcp, dims<span class="op">=</span>(<span class="st">"id_obs"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="dd2d87abb77bb5c1" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:03:27.305815Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:03:27.021522Z&quot;}" data-execution_count="12">
+<div id="dd2d87abb77bb5c1" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:05.686665Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:05.197659Z&quot;}" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="11">
 <div>
 <figure class="figure">
 <p><img src="roi_decision_files/figure-html/cell-12-output-1.svg" class="img-fluid figure-img"></p>
@@ -512,7 +512,7 @@ For details and migration guidance, visit: https://python.arviz.org/en/latest/us
 <section id="非中心化による階層ベイズモデル-1" class="level4">
 <h4 class="anchored" data-anchor-id="非中心化による階層ベイズモデル-1">非中心化による階層ベイズモデル</h4>
 <p>この構造により、モデルは「情報の借用（Shrinkage）」を適切に行いつつ、小規模データでもサンプリングが収束しやすい（発散しにくい）堅牢なものになっています。 - 【直感】: 個性の強さ」と「個々のズレ」を分ける 「ページごとの個性がどれくらい強いか（sigma_page）」というボリュームのつまみと、 「各ページが標準からどの方向にズレているか（offset_page_z）」という方向のつまみを分けたイメージです。 これにより、データが少ないCheckoutページなどの推定値が、全体の平均（mu_global）に向かって適切に引き寄せられ、極端な外れ値に振り回されるのを防ぎます。</p>
-<div id="4f82255b4016786c" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:04:10.266318Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:03:48.125913Z&quot;}" data-execution_count="13">
+<div id="4f82255b4016786c" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:23.630807Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:05.843220Z&quot;}" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 推論 ---</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model:</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> pm.sample(draws<span class="op">=</span><span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, target_accept<span class="op">=</span><span class="fl">0.95</span>, random_seed<span class="op">=</span>RANDOM_SEED)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -523,17 +523,17 @@ NUTS: [mu_global, sigma_page, offset_page_z, sigma_obs]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"version_major":2,"version_minor":0,"model_id":"c3080dcd469449268131a2c5037e55aa","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"version_major":2,"version_minor":0,"model_id":"c1096ae5e1ab42ddab087b010601003a","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 2_000 draw iterations (4_000 + 8_000 draws total) took 20 seconds.</code></pre>
+<pre><code>Sampling 4 chains for 1_000 tune and 2_000 draw iterations (4_000 + 8_000 draws total) took 15 seconds.</code></pre>
 </div>
 </div>
-<div id="9b6799bc7ae30d11" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:04:34.453361Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:04:30.664836Z&quot;}" data-execution_count="14">
+<div id="9b6799bc7ae30d11" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:26.711285Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:23.692884Z&quot;}" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 推論結果</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(trace, compact<span class="op">=</span><span class="va">False</span>, var_names<span class="op">=</span>[<span class="st">"mu_global"</span>, <span class="st">"sigma_page"</span>, <span class="st">"offset_page_z"</span>])</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -549,9 +549,9 @@ NUTS: [mu_global, sigma_page, offset_page_z, sigma_obs]</code></pre>
 <h5 class="anchored" data-anchor-id="トレースプロットの形状fuzzy-caterpillar">1. トレースプロットの形状（Fuzzy Caterpillar）</h5>
 <p>見た目の特徴: 各チェーン（異なる色の線）が互いにしっかりと混ざり合い、特定の傾向（右肩上がりや下がり）を持たず、一定の範囲を細かく上下に振動しています。</p>
 <p>解釈: これがいわゆる「毛虫（Fuzzy Caterpillar）」のような状態であり、サンプラーが事後分布の全体を効率よく探索できていることを示します。 特定の場所で停滞したり、チェーンごとに大きく値が離れたりしていないため、良好な収束のサインです。</p>
-<div id="c34cb321d86385c4" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:04:40.192075Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:04:39.953722Z&quot;}" data-execution_count="15">
+<div id="c34cb321d86385c4" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:26.924776Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:26.803455Z&quot;}" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>az.summary(trace, var_names<span class="op">=</span>[<span class="st">"mu_global"</span>, <span class="st">"sigma_page"</span>, <span class="st">"offset_page_z"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div>
 
 
@@ -721,7 +721,7 @@ NUTS: [mu_global, sigma_page, offset_page_z, sigma_obs]</code></pre>
 <p><strong>数値</strong> : 今回の設定（draws=2000, chains=4 の場合、計 8000 サンプル）に対して、十分な大きさ（数百〜数千以上）が確保されています。</p>
 <p><strong>解釈</strong> : MCMC のサンプルは前後の値に相関があるため、実際のサンプル数よりも「有効な（独立した）情報量」は少なくなります。 ESS が大きいことは、自己相関が低く、事後分布の平均や裾（テイル）の推定が安定していることを示します。</p>
 <p>1, 2, 3, より MCMC は、非常に良好に収束しており、推論結果は十分に信頼できる状態と判断。</p>
-<div id="c54ad6de7800756f" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:04:59.994552Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:04:59.467518Z&quot;}" data-execution_count="16">
+<div id="7973f99d4ba599dc" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:27.826408Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:27.038705Z&quot;}" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Shrinkage (情報の借用)の可視化 ---</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Source-data の平均（MEL: 最尤推定に相当）</span></span>
@@ -778,47 +778,13 @@ NUTS: [mu_global, sigma_page, offset_page_z, sigma_obs]</code></pre>
 <span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
 <span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a>    ax.set_aspect(<span class="st">"equal"</span>, adjustable<span class="op">=</span><span class="st">"box"</span>)</span>
 <span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"Shrinkage (情報の借用) の可視化"</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"Visualization of Shrinkage"</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
 <span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 24773 (\N{CJK UNIFIED IDEOGRAPH-60C5}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 22577 (\N{CJK UNIFIED IDEOGRAPH-5831}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 12398 (\N{HIRAGANA LETTER NO}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 20511 (\N{CJK UNIFIED IDEOGRAPH-501F}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 29992 (\N{CJK UNIFIED IDEOGRAPH-7528}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 21487 (\N{CJK UNIFIED IDEOGRAPH-53EF}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 35222 (\N{CJK UNIFIED IDEOGRAPH-8996}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/tmp/ipykernel_13667/2364994097.py:58: UserWarning: Glyph 21270 (\N{CJK UNIFIED IDEOGRAPH-5316}) missing from font(s) DejaVu Sans.
-  plt.tight_layout()
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 24773 (\N{CJK UNIFIED IDEOGRAPH-60C5}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 22577 (\N{CJK UNIFIED IDEOGRAPH-5831}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 12398 (\N{HIRAGANA LETTER NO}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 20511 (\N{CJK UNIFIED IDEOGRAPH-501F}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 29992 (\N{CJK UNIFIED IDEOGRAPH-7528}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 21487 (\N{CJK UNIFIED IDEOGRAPH-53EF}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 35222 (\N{CJK UNIFIED IDEOGRAPH-8996}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)
-/home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 21270 (\N{CJK UNIFIED IDEOGRAPH-5316}) missing from font(s) DejaVu Sans.
-  fig.canvas.print_figure(bytes_io, **kw)</code></pre>
-</div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="roi_decision_files/figure-html/cell-16-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="roi_decision_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -865,26 +831,26 @@ NUTS: [mu_global, sigma_page, offset_page_z, sigma_obs]</code></pre>
 <li><strong>データが十分にある</strong> : 生データをほぼそのまま信頼</li>
 </ul>
 </blockquote>
-<div id="90de2d737440028a" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:05:17.860369Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:05:17.835992Z&quot;}" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shrinkage の強さを数値化</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Shrinkage Analysis ---"</span>)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Page'</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Group'</span><span class="sc">:&lt;6}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Raw (ms)'</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Bayes (ms)'</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Shrinkage %'</span><span class="sc">:&lt;12}</span><span class="ss">"</span>)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page <span class="kw">in</span> pages:</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> group <span class="kw">in</span> groups:</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        raw <span class="op">=</span> means_raw_log[(page, group)]</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        bayes <span class="op">=</span> <span class="bu">float</span>(mu_posterior_page.sel(page<span class="op">=</span>page, group<span class="op">=</span>group).values)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        grand <span class="op">=</span> <span class="bu">float</span>(mu_posterior_global.sel(group<span class="op">=</span>group).values)</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Shrinkage率: Source-data から全体平均にどれだけ引き寄せられたか</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">abs</span>(raw <span class="op">-</span> grand) <span class="op">&gt;</span> <span class="fl">0.001</span>:</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>            pct_shrinkage <span class="op">=</span> (raw <span class="op">-</span> bayes) <span class="op">/</span> (raw <span class="op">-</span> grand) <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>            pct_shrinkage <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 実空間(ms)に変換して表示</span></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>page<span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span>group<span class="sc">:&lt;6}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>exp(raw)<span class="sc">:&lt;12.0f}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>exp(bayes)<span class="sc">:&lt;12.0f}</span><span class="ss"> </span><span class="sc">{</span>pct_shrinkage<span class="sc">:&lt;12.1f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="90de2d737440028a" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:28.131997Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:28.113227Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shrinkage の強さを数値化</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Shrinkage Analysis ---"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Page'</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Group'</span><span class="sc">:&lt;6}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Raw (ms)'</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Bayes (ms)'</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'Shrinkage %'</span><span class="sc">:&lt;12}</span><span class="ss">"</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page <span class="kw">in</span> pages:</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> group <span class="kw">in</span> groups:</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        raw <span class="op">=</span> means_raw_log[(page, group)]</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        bayes <span class="op">=</span> <span class="bu">float</span>(mu_posterior_page.sel(page<span class="op">=</span>page, group<span class="op">=</span>group).values)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>        grand <span class="op">=</span> <span class="bu">float</span>(mu_posterior_global.sel(group<span class="op">=</span>group).values)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Shrinkage率: Source-data から全体平均にどれだけ引き寄せられたか</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">abs</span>(raw <span class="op">-</span> grand) <span class="op">&gt;</span> <span class="fl">0.001</span>:</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>            pct_shrinkage <span class="op">=</span> (raw <span class="op">-</span> bayes) <span class="op">/</span> (raw <span class="op">-</span> grand) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>            pct_shrinkage <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 実空間(ms)に変換して表示</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>page<span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span>group<span class="sc">:&lt;6}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>exp(raw)<span class="sc">:&lt;12.0f}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>exp(bayes)<span class="sc">:&lt;12.0f}</span><span class="ss"> </span><span class="sc">{</span>pct_shrinkage<span class="sc">:&lt;12.1f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- Shrinkage Analysis ---
 Page         Group  Raw (ms)     Bayes (ms)   Shrinkage % 
@@ -904,43 +870,43 @@ Checkout     post   3590         3362         35.2        %</code></pre>
 <section id="rope-判定実質的等価姓の確認" class="level3">
 <h3 class="anchored" data-anchor-id="rope-判定実質的等価姓の確認">ROPE 判定（実質的等価姓の確認）</h3>
 <p><strong>ROPE定義</strong> : 「変化が ±50ms 以内であれば、User は気づかない」と定義する。</p>
-<div id="f152a1d8a49c9c31" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:05:27.864368Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:05:27.841764Z&quot;}" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 事後分布の抽出と Data 整形</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>posterior <span class="op">=</span> trace.posterior</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mu_page: (chain, draw, page, group) -&gt; (samples, page, group)</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># stack chain and draw</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>mu_samples <span class="op">=</span> posterior[<span class="st">"mu_page"</span>].stack(sample<span class="op">=</span>(<span class="st">"chain"</span>, <span class="st">"draw"</span>)).values.transpose(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 対数空間から実空間(ms)へ</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>samples_lcp_ms <span class="op">=</span> np.exp(mu_samples)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># shape: (samples, 4_pages, 2_groups) -&gt; 0:Pre, 1:Post</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 改善量 (Pre - Post)</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>ms_diff <span class="op">=</span> samples_lcp_ms[:, :, <span class="dv">0</span>] <span class="op">-</span> samples_lcp_ms[:, :, <span class="dv">1</span>]</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># shape: (samples, 4_pages)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f152a1d8a49c9c31" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:28.389626Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:28.374971Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 事後分布の抽出と Data 整形</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>posterior <span class="op">=</span> trace.posterior</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mu_page: (chain, draw, page, group) -&gt; (samples, page, group)</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># stack chain and draw</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>mu_samples <span class="op">=</span> posterior[<span class="st">"mu_page"</span>].stack(sample<span class="op">=</span>(<span class="st">"chain"</span>, <span class="st">"draw"</span>)).values.transpose(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 対数空間から実空間(ms)へ</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>samples_lcp_ms <span class="op">=</span> np.exp(mu_samples)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># shape: (samples, 4_pages, 2_groups) -&gt; 0:Pre, 1:Post</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 改善量 (Pre - Post)</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>ms_diff <span class="op">=</span> samples_lcp_ms[:, :, <span class="dv">0</span>] <span class="op">-</span> samples_lcp_ms[:, :, <span class="dv">1</span>]</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># shape: (samples, 4_pages)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="3b71df4d19160b9b" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:05:48.186298Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:05:48.161013Z&quot;}" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- ROPE Analysis ---</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>ROPE_RANGE <span class="op">=</span> [<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>]  <span class="co"># ±100ms は誤差とみなす</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- ROPE Analysis (Probability of Practical Effect)---"</span>)</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ROPE内に入っている確立</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    prob_in_rope <span class="op">=</span> np.mean((ms_diff[:, i] <span class="op">&gt;</span> ROPE_RANGE[<span class="dv">0</span>]) <span class="op">&amp;</span> (ms_diff[:, i] <span class="op">&lt;</span> ROPE_RANGE[<span class="dv">1</span>]))</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ROPE より改善している (&gt;500ms) 確率</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    prob_better <span class="op">=</span> np.mean(ms_diff[:, i] <span class="op">&gt;=</span> ROPE_RANGE[<span class="dv">1</span>])</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ROPE より悪化している (&lt;-500ms) 確率</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    prob_worse <span class="op">=</span> np.mean(ms_diff[:, i] <span class="op">&lt;=</span> ROPE_RANGE[<span class="dv">0</span>])</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Page: </span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Mean Diff: </span><span class="sc">{</span>ms_diff[:, i]<span class="sc">.</span>mean()<span class="sc">:.1f}</span><span class="ss"> ms"</span>)</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Prob Better (&gt;</span><span class="sc">{</span>ROPE_RANGE[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">ms):  </span><span class="sc">{</span>prob_better <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Prob Worse: (&lt;</span><span class="sc">{</span>ROPE_RANGE[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">ms): </span><span class="sc">{</span>prob_worse <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Prob Equiv  (In ROPE): </span><span class="sc">{</span>prob_in_rope <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3b71df4d19160b9b" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:28.473887Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:28.459424Z&quot;}" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- ROPE Analysis ---</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>ROPE_RANGE <span class="op">=</span> [<span class="op">-</span><span class="dv">100</span>, <span class="dv">100</span>]  <span class="co"># ±100ms は誤差とみなす</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- ROPE Analysis (Probability of Practical Effect)---"</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ROPE内に入っている確立</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    prob_in_rope <span class="op">=</span> np.mean((ms_diff[:, i] <span class="op">&gt;</span> ROPE_RANGE[<span class="dv">0</span>]) <span class="op">&amp;</span> (ms_diff[:, i] <span class="op">&lt;</span> ROPE_RANGE[<span class="dv">1</span>]))</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ROPE より改善している (&gt;500ms) 確率</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    prob_better <span class="op">=</span> np.mean(ms_diff[:, i] <span class="op">&gt;=</span> ROPE_RANGE[<span class="dv">1</span>])</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ROPE より悪化している (&lt;-500ms) 確率</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    prob_worse <span class="op">=</span> np.mean(ms_diff[:, i] <span class="op">&lt;=</span> ROPE_RANGE[<span class="dv">0</span>])</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Page: </span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Mean Diff: </span><span class="sc">{</span>ms_diff[:, i]<span class="sc">.</span>mean()<span class="sc">:.1f}</span><span class="ss"> ms"</span>)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Prob Better (&gt;</span><span class="sc">{</span>ROPE_RANGE[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">ms):  </span><span class="sc">{</span>prob_better <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Prob Worse: (&lt;</span><span class="sc">{</span>ROPE_RANGE[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">ms): </span><span class="sc">{</span>prob_worse <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Prob Equiv  (In ROPE): </span><span class="sc">{</span>prob_in_rope <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- ROPE Analysis (Probability of Practical Effect)---
 Page: Top
@@ -969,70 +935,70 @@ Page: Checkout
 ------------------------------</code></pre>
 </div>
 </div>
-<div id="777e57c27fa5b650" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:06:04.713139Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:06:03.579387Z&quot;}" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 可視化: 事後分布の HDI と ROPE の重なり具合 ---</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>HDI_PROB <span class="op">=</span> <span class="fl">0.94</span>  <span class="co"># 94% HDI</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 可視化 ---</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">10</span>))</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>axes_flat <span class="op">=</span> axes.flatten()</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes_flat[i]</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    data_page <span class="op">=</span> ms_diff[:, i]  <span class="co"># 各ページの改善量サンプル (shape: 8000,)</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. 事後分布の Histogram / KDE</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    az.plot_kde(data_page, ax<span class="op">=</span>ax, plot_kwargs<span class="op">=</span>{<span class="st">"color"</span>: <span class="st">"mediumpurple"</span>, <span class="st">"linewidth"</span>: <span class="dv">2</span>}, fill_kwargs<span class="op">=</span>{<span class="st">"alpha"</span>: <span class="fl">0.4</span>})</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. HDI (94%) を計算してプロット</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    hdi <span class="op">=</span> az.hdi(data_page, hdi_prob<span class="op">=</span>HDI_PROB)</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    ax.axvline(hdi[<span class="dv">0</span>], color<span class="op">=</span><span class="st">"mediumpurple"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>HDI_PROB <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% HDI"</span>)</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    ax.axvline(hdi[<span class="dv">1</span>], color<span class="op">=</span><span class="st">"mediumpurple"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># HDI範囲の塗りつぶし（Option）</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>    ax.axvspan(hdi[<span class="dv">0</span>], hdi[<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"mediumpurple"</span>)</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. ROPE を塗りつぶしてプロット</span></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>    ax.axvspan(ROPE_RANGE[<span class="dv">0</span>], ROPE_RANGE[<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"orange"</span>,</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f"ROPE (</span><span class="sc">{</span>ROPE_RANGE[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>ROPE_RANGE[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> ms)"</span>)</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. 参照戦（ゼロ）</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    ax.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">":"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">"No Effect (0)"</span>)</span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 5. タイトルと判定ラベル</span></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>    mean_diff <span class="op">=</span> np.mean(data_page)</span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 判定ロジック</span></span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> hdi[<span class="dv">0</span>] <span class="op">&gt;</span> ROPE_RANGE[<span class="dv">1</span>]:</span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"明確な改善"</span></span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"seagreen"</span></span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> hdi[<span class="dv">1</span>] <span class="op">&lt;</span> ROPE_RANGE[<span class="dv">0</span>]:</span>
-<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"明確な悪化"</span></span>
-<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"indianred"</span></span>
-<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> hdi[<span class="dv">0</span>] <span class="op">&gt;</span> ROPE_RANGE[<span class="dv">0</span>] <span class="kw">and</span> hdi[<span class="dv">1</span>] <span class="op">&lt;</span> ROPE_RANGE[<span class="dv">1</span>]:</span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"実質的に等価"</span></span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"slategray"</span></span>
-<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"判断保留"</span></span>
-<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"goldenrod"</span></span>
-<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss"> Page</span><span class="ch">\n</span><span class="ss">Mean: </span><span class="sc">{</span>mean_diff<span class="sc">:.0f}</span><span class="ss"> ms | </span><span class="sc">{</span>verdict<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span>verdict_color,</span>
-<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>                 fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"LCP Change (Pre - Post) [ms]"</span>)</span>
-<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">"upper right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"ROPE Analysis: HDI vs. ROPE Overlap"</span>, fontsize<span class="op">=</span><span class="dv">16</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="a164ffd6c075df68" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:29.372702Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:28.635860Z&quot;}" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 可視化: 事後分布の HDI と ROPE の重なり具合 ---</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>HDI_PROB <span class="op">=</span> <span class="fl">0.94</span>  <span class="co"># 94% HDI</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 可視化 ---</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">8</span>))</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>axes_flat <span class="op">=</span> axes.flatten()</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, page <span class="kw">in</span> <span class="bu">enumerate</span>(pages):</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes_flat[i]</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    data_page <span class="op">=</span> ms_diff[:, i]  <span class="co"># 各ページの改善量サンプル (shape: 8000,)</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. 事後分布の Histogram / KDE</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    az.plot_kde(data_page, ax<span class="op">=</span>ax, plot_kwargs<span class="op">=</span>{<span class="st">"color"</span>: <span class="st">"mediumpurple"</span>, <span class="st">"linewidth"</span>: <span class="dv">2</span>}, fill_kwargs<span class="op">=</span>{<span class="st">"alpha"</span>: <span class="fl">0.4</span>})</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. HDI (94%) を計算してプロット</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    hdi <span class="op">=</span> az.hdi(data_page, hdi_prob<span class="op">=</span>HDI_PROB)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    ax.axvline(hdi[<span class="dv">0</span>], color<span class="op">=</span><span class="st">"mediumpurple"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>HDI_PROB <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% HDI"</span>)</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    ax.axvline(hdi[<span class="dv">1</span>], color<span class="op">=</span><span class="st">"mediumpurple"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># HDI範囲の塗りつぶし（Option）</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    ax.axvspan(hdi[<span class="dv">0</span>], hdi[<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"mediumpurple"</span>)</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. ROPE を塗りつぶしてプロット</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    ax.axvspan(ROPE_RANGE[<span class="dv">0</span>], ROPE_RANGE[<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"orange"</span>,</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f"ROPE (</span><span class="sc">{</span>ROPE_RANGE[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>ROPE_RANGE[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> ms)"</span>)</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. 参照戦（ゼロ）</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    ax.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">":"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">"No Effect (0)"</span>)</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 5. タイトルと判定ラベル</span></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    mean_diff <span class="op">=</span> np.mean(data_page)</span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 判定ロジック</span></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> hdi[<span class="dv">0</span>] <span class="op">&gt;</span> ROPE_RANGE[<span class="dv">1</span>]:</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"明確な改善"</span></span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"seagreen"</span></span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> hdi[<span class="dv">1</span>] <span class="op">&lt;</span> ROPE_RANGE[<span class="dv">0</span>]:</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"明確な悪化"</span></span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"indianred"</span></span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> hdi[<span class="dv">0</span>] <span class="op">&gt;</span> ROPE_RANGE[<span class="dv">0</span>] <span class="kw">and</span> hdi[<span class="dv">1</span>] <span class="op">&lt;</span> ROPE_RANGE[<span class="dv">1</span>]:</span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"実質的に等価"</span></span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"slategray"</span></span>
+<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>        verdict <span class="op">=</span> <span class="st">"判断保留"</span></span>
+<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>        verdict_color <span class="op">=</span> <span class="st">"goldenrod"</span></span>
+<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss"> Page</span><span class="ch">\n</span><span class="ss">Mean: </span><span class="sc">{</span>mean_diff<span class="sc">:.0f}</span><span class="ss"> ms | </span><span class="sc">{</span>verdict<span class="sc">}</span><span class="ss">"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span>verdict_color,</span>
+<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a>                 fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"LCP Change (Pre - Post) [ms]"</span>)</span>
+<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Density"</span>)</span>
+<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">"upper right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb26-52"><a href="#cb26-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-53"><a href="#cb26-53" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"ROPE Analysis: HDI vs. ROPE Overlap"</span>, fontsize<span class="op">=</span><span class="dv">16</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb26-54"><a href="#cb26-54" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb26-55"><a href="#cb26-55" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_13667/1007172029.py:54: UserWarning: Glyph 21028 (\N{CJK UNIFIED IDEOGRAPH-5224}) missing from font(s) DejaVu Sans.
+<pre><code>/tmp/ipykernel_427225/221660050.py:54: UserWarning: Glyph 21028 (\N{CJK UNIFIED IDEOGRAPH-5224}) missing from font(s) DejaVu Sans.
   plt.tight_layout()
-/tmp/ipykernel_13667/1007172029.py:54: UserWarning: Glyph 26029 (\N{CJK UNIFIED IDEOGRAPH-65AD}) missing from font(s) DejaVu Sans.
+/tmp/ipykernel_427225/221660050.py:54: UserWarning: Glyph 26029 (\N{CJK UNIFIED IDEOGRAPH-65AD}) missing from font(s) DejaVu Sans.
   plt.tight_layout()
-/tmp/ipykernel_13667/1007172029.py:54: UserWarning: Glyph 20445 (\N{CJK UNIFIED IDEOGRAPH-4FDD}) missing from font(s) DejaVu Sans.
+/tmp/ipykernel_427225/221660050.py:54: UserWarning: Glyph 20445 (\N{CJK UNIFIED IDEOGRAPH-4FDD}) missing from font(s) DejaVu Sans.
   plt.tight_layout()
-/tmp/ipykernel_13667/1007172029.py:54: UserWarning: Glyph 30041 (\N{CJK UNIFIED IDEOGRAPH-7559}) missing from font(s) DejaVu Sans.
+/tmp/ipykernel_427225/221660050.py:54: UserWarning: Glyph 30041 (\N{CJK UNIFIED IDEOGRAPH-7559}) missing from font(s) DejaVu Sans.
   plt.tight_layout()
 /home/peta/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/IPython/core/pylabtools.py:170: UserWarning: Glyph 21028 (\N{CJK UNIFIED IDEOGRAPH-5224}) missing from font(s) DejaVu Sans.
   fig.canvas.print_figure(bytes_io, **kw)
@@ -1228,26 +1194,26 @@ Page: Checkout
 </section>
 <section id="roi-シミュレーション-経済的判断" class="level3">
 <h3 class="anchored" data-anchor-id="roi-シミュレーション-経済的判断">ROI-シミュレーション (経済的判断)</h3>
-<div id="de5bc07b8784a2bf" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:07:23.989419Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:07:23.979538Z&quot;}" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Business Parameters ---</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> ms_diff.shape[<span class="dv">0</span>]  <span class="co"># サンプル数を取得</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 基本パラメータ</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>PV_MONTHLY <span class="op">=</span> np.array([<span class="dv">1_000_000</span>, <span class="dv">100_000</span>, <span class="dv">10_000</span>, <span class="dv">1_000</span>])</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>AOV <span class="op">=</span> <span class="dv">5_000</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>COST_IMPLEMENTATION <span class="op">=</span> <span class="dv">100_000</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 感度(Sensitivity) を (N_sample, 4) の行列として生成</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>matrix_sensitivity <span class="op">=</span> np.tile([<span class="fl">0.0001</span>, <span class="fl">0.0005</span>, <span class="fl">0.0050</span>, <span class="fl">0.0000</span>], (n_samples, <span class="dv">1</span>))  <span class="co"># 固定値で初期化</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 【重要】Checkout (Index 3) の感度を「幅のある分布」として生成</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co"># "0.04〜0.06の間でばらつく" -&gt; 一様分布 (Uniform Distribution) を採用</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ※ より確信がある場合は正規分布 rng.normal(loc=0.05, scale=0.005, size=n_samples) なども可</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>sensitivity_checkout_dist <span class="op">=</span> rng.uniform(low<span class="op">=</span><span class="fl">0.04</span>, high<span class="op">=</span><span class="fl">0.06</span>, size<span class="op">=</span>n_samples)</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>matrix_sensitivity[:, <span class="dv">3</span>] <span class="op">=</span> sensitivity_checkout_dist</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 1ms あたりの価値も分布になる（N_samples, 4）</span></span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>value_per_ms_dist <span class="op">=</span> matrix_sensitivity <span class="op">*</span> PV_MONTHLY <span class="op">*</span> AOV</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="de5bc07b8784a2bf" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:29.503771Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:29.495838Z&quot;}" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Business Parameters ---</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> ms_diff.shape[<span class="dv">0</span>]  <span class="co"># サンプル数を取得</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 基本パラメータ</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>PV_MONTHLY <span class="op">=</span> np.array([<span class="dv">1_000_000</span>, <span class="dv">100_000</span>, <span class="dv">10_000</span>, <span class="dv">1_000</span>])</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>AOV <span class="op">=</span> <span class="dv">5_000</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>COST_IMPLEMENTATION <span class="op">=</span> <span class="dv">100_000</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 感度(Sensitivity) を (N_sample, 4) の行列として生成</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>matrix_sensitivity <span class="op">=</span> np.tile([<span class="fl">0.0001</span>, <span class="fl">0.0005</span>, <span class="fl">0.0050</span>, <span class="fl">0.0000</span>], (n_samples, <span class="dv">1</span>))  <span class="co"># 固定値で初期化</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 【重要】Checkout (Index 3) の感度を「幅のある分布」として生成</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># "0.04〜0.06の間でばらつく" -&gt; 一様分布 (Uniform Distribution) を採用</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ※ より確信がある場合は正規分布 rng.normal(loc=0.05, scale=0.005, size=n_samples) なども可</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>sensitivity_checkout_dist <span class="op">=</span> rng.uniform(low<span class="op">=</span><span class="fl">0.04</span>, high<span class="op">=</span><span class="fl">0.06</span>, size<span class="op">=</span>n_samples)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>matrix_sensitivity[:, <span class="dv">3</span>] <span class="op">=</span> sensitivity_checkout_dist</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 1ms あたりの価値も分布になる（N_samples, 4）</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>value_per_ms_dist <span class="op">=</span> matrix_sensitivity <span class="op">*</span> PV_MONTHLY <span class="op">*</span> AOV</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="ビジネスパラメータの定義固定値と不確実性の統合" class="level4">
 <h4 class="anchored" data-anchor-id="ビジネスパラメータの定義固定値と不確実性の統合">ビジネスパラメータの定義：固定値と不確実性の統合</h4>
@@ -1298,30 +1264,30 @@ Page: Checkout
 <li><strong>【直感】</strong>: これまでは「1ms遅れると250円の損失」と決め打ちしていましたが、ここでは「<strong>200円〜300円の間のどこか</strong>」というように、損失単価自体が揺れ動く幅を持っています。これにより、<strong>「感度が高く、かつ速度も遅くなった」という最悪のシナリオ（ワーストケース）</strong>を含めた評価が可能になります。</li>
 </ul></li>
 </ul>
-<div id="2b1752e2f1c637d1" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:07:29.410971Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:07:29.402972Z&quot;}" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- ROI Calculation with Sensitivity Analysis ---</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ページごとの損益インパクト (円)</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ms_diff (速度の不確実性) × value_per_ms_dist (ビジネス感度の不確実性)</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>impact_per_page_prob <span class="op">=</span> ms_diff <span class="op">*</span> value_per_ms_dist</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co"># トータルの純利益分布</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>total_revenue_uplift <span class="op">=</span> np.<span class="bu">sum</span>(impact_per_page_prob, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>profit_net_prob <span class="op">=</span> total_revenue_uplift <span class="op">-</span> COST_IMPLEMENTATION</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2b1752e2f1c637d1" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:29.557961Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:29.553041Z&quot;}" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- ROI Calculation with Sensitivity Analysis ---</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ページごとの損益インパクト (円)</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ms_diff (速度の不確実性) × value_per_ms_dist (ビジネス感度の不確実性)</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>impact_per_page_prob <span class="op">=</span> ms_diff <span class="op">*</span> value_per_ms_dist</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># トータルの純利益分布</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>total_revenue_uplift <span class="op">=</span> np.<span class="bu">sum</span>(impact_per_page_prob, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>profit_net_prob <span class="op">=</span> total_revenue_uplift <span class="op">-</span> COST_IMPLEMENTATION</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="98540d8041f13c79" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T01:07:30.949510Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T01:07:30.628706Z&quot;}" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Visualization ---</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 01: Total Net Profit (Sensitivity Included)</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>plt.hist(profit_net_prob, bins<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, density<span class="op">=</span><span class="va">True</span>, label<span class="op">=</span><span class="st">"Net Profit Dist"</span>)</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span>COLOR_YELLOW, label<span class="op">=</span><span class="st">"Break-even"</span>)</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Total ROI Distribution</span><span class="ch">\n</span><span class="st">(w/ Sensitivity Uncertainty)"</span>)</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Net Profit (JPY)"</span>)</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="98540d8041f13c79" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:30.076957Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:29.625864Z&quot;}" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Visualization ---</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 01: Total Net Profit (Sensitivity Included)</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>plt.hist(profit_net_prob, bins<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, density<span class="op">=</span><span class="va">True</span>, label<span class="op">=</span><span class="st">"Net Profit Dist"</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span>COLOR_YELLOW, label<span class="op">=</span><span class="st">"Break-even"</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Total ROI Distribution</span><span class="ch">\n</span><span class="st">(w/ Sensitivity Uncertainty)"</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Net Profit (JPY)"</span>)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Density"</span>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1386,19 +1352,19 @@ Page: Checkout
 <p><strong>【直感】</strong></p>
 <p>「100ms速くなったら売上が1%上がる」と決め打ちするのではなく、「0.5%〜1.5%くらいの幅で上がるかもしれない」という<strong>幅を持たせて計算</strong>しています。これにより、「最悪のケースでも黒字か？」「最良のケースでどこまで伸びるか？」といった問いに答えられます。</p>
 </blockquote>
-<div id="7f424d8316aad8ce" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T07:08:32.321295Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T07:08:30.837021Z&quot;}" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 2: Checkout Page Impact Only</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>idx_checkout <span class="op">=</span> <span class="bu">list</span>(pages).index(<span class="st">"Checkout"</span>)</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>plt.hist(impact_per_page_prob[:, idx_checkout], bins<span class="op">=</span><span class="dv">50</span>, color<span class="op">=</span>COLOR_RED, alpha<span class="op">=</span><span class="fl">0.7</span>, density<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Checkout Page Imapct Risk</span><span class="ch">\n</span><span class="st">(Sensitivity: 0.04~0.06)"</span>)</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Revenue Change (JPY)"</span>)</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7f424d8316aad8ce" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:30.445391Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:30.109228Z&quot;}" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 2: Checkout Page Impact Only</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>idx_checkout <span class="op">=</span> <span class="bu">list</span>(pages).index(<span class="st">"Checkout"</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>plt.hist(impact_per_page_prob[:, idx_checkout], bins<span class="op">=</span><span class="dv">50</span>, color<span class="op">=</span>COLOR_RED, alpha<span class="op">=</span><span class="fl">0.7</span>, density<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Checkout Page Imapct Risk</span><span class="ch">\n</span><span class="st">(Sensitivity: 0.04~0.06)"</span>)</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Revenue Change (JPY)"</span>)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1471,19 +1437,19 @@ Page: Checkout
 <section id="ビジネス上の示唆" class="level5">
 <h5 class="anchored" data-anchor-id="ビジネス上の示唆">ビジネス上の示唆</h5>
 <p>このプロットから得られる重要な洞察は、<strong>「全体のROIがプラスでも、Checkoutページ単体で見ると大きな損失が発生している可能性がある」</strong>という点です。特にECサイトにおいて、決済直前のパフォーマンス劣化は「カゴ落ち」を招き、LTV（顧客生涯価値）の低下やブランド毀損につながる<strong>取り返しのつかない損失</strong>となるリスクがあります。</p>
-<div id="eb818c91aabafec5" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-22T07:17:44.405073Z&quot;,&quot;start_time&quot;:&quot;2025-12-22T07:17:44.358275Z&quot;}" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 4. 意思決定指標 (Decision Metric) ---</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>mean_profit <span class="op">=</span> np.mean(profit_net_prob)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>rate_win <span class="op">=</span> np.mean(profit_net_prob <span class="op">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 感度が下振れ(0.04)した場合も含めた、Checkout ページの損失リスク</span></span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>risk_checkout_loss <span class="op">=</span> np.mean(impact_per_page_prob[:, idx_checkout] <span class="op">&lt;</span> <span class="op">-</span><span class="dv">10_000</span>)</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Sensitivity Analysis Result ==="</span>)</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Checkout Sensitivity: Uniform(0.04, 0.06)"</span>)</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Net Profit: </span><span class="sc">{</span>mean_profit<span class="sc">:,.0f}</span><span class="ss"> JPY"</span>)</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Win Rate: (Profit &gt; 0): </span><span class="sc">{</span>rate_win <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Checkout Risk (Loss &gt; 10k): </span><span class="sc">{</span>risk_checkout_loss <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="eb818c91aabafec5" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2025-12-31T18:35:30.476424Z&quot;,&quot;start_time&quot;:&quot;2025-12-31T18:35:30.467198Z&quot;}" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 4. 意思決定指標 (Decision Metric) ---</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>mean_profit <span class="op">=</span> np.mean(profit_net_prob)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>rate_win <span class="op">=</span> np.mean(profit_net_prob <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 感度が下振れ(0.04)した場合も含めた、Checkout ページの損失リスク</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>risk_checkout_loss <span class="op">=</span> np.mean(impact_per_page_prob[:, idx_checkout] <span class="op">&lt;</span> <span class="op">-</span><span class="dv">10_000</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Sensitivity Analysis Result ==="</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Checkout Sensitivity: Uniform(0.04, 0.06)"</span>)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected Net Profit: </span><span class="sc">{</span>mean_profit<span class="sc">:,.0f}</span><span class="ss"> JPY"</span>)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Win Rate: (Profit &gt; 0): </span><span class="sc">{</span>rate_win <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Checkout Risk (Loss &gt; 10k): </span><span class="sc">{</span>risk_checkout_loss <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Sensitivity Analysis Result ===
 Checkout Sensitivity: Uniform(0.04, 0.06)

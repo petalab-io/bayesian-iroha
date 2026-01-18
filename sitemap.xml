@@ -2,11 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/01_web_performance/roi_decision.html</loc>
-    <lastmod>2025-12-28T04:36:51.550Z</lastmod>
+    <lastmod>2026-01-18T18:29:39.097Z</lastmod>
+  </url>
+  <url>
+    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/03_Sales_forecast_by_market_location/hierarchical_baysian_linear_regression.html</loc>
+    <lastmod>2026-01-18T18:29:39.109Z</lastmod>
   </url>
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/index.html</loc>
-    <lastmod>2025-12-30T02:10:55.567Z</lastmod>
+    <lastmod>2026-01-18T18:57:20.621Z</lastmod>
+  </url>
+  <url>
+    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/03_Sales_forecast_by_market_location/weakly_information_prior.html</loc>
+    <lastmod>2026-01-18T18:29:39.117Z</lastmod>
   </url>
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/02_hockey_gotender/hockey_spatial_analysis.html</loc>

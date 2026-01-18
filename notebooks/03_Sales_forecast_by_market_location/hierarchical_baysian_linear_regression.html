@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>階層ベイズ線形回帰によるマルシェ出店地点別の売上予測 – ベイジアンいろは</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2df5bd0b2bf7f82aff587e37ec50217e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      ベイジアンいろは
+      </li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">ベイジアンいろは</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Web Performance ROI Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/01_web_performance/roi_decision.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">エグゼクティブサマリー</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">spatial model Analysis</span></span>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#エグゼクティブサマリー" id="toc-エグゼクティブサマリー" class="nav-link active" data-scroll-target="#エグゼクティブサマリー">エグゼクティブサマリー</a></li>
+  <li><a href="#事前準備" id="toc-事前準備" class="nav-link" data-scroll-target="#事前準備">事前準備</a></li>
+  <li><a href="#データの準備とホワイトボックス化" id="toc-データの準備とホワイトボックス化" class="nav-link" data-scroll-target="#データの準備とホワイトボックス化">データの準備とホワイトボックス化</a></li>
+  <li><a href="#特徴量生成とインデックス化" id="toc-特徴量生成とインデックス化" class="nav-link" data-scroll-target="#特徴量生成とインデックス化">特徴量生成とインデックス化</a></li>
+  <li><a href="#確率モデルの構築" id="toc-確率モデルの構築" class="nav-link" data-scroll-target="#確率モデルの構築">確率モデルの構築</a>
+  <ul class="collapse">
+  <li><a href="#結果の解釈" id="toc-結果の解釈" class="nav-link" data-scroll-target="#結果の解釈">結果の解釈</a></li>
+  </ul></li>
+  <li><a href="#推論-mcmc-と診断" id="toc-推論-mcmc-と診断" class="nav-link" data-scroll-target="#推論-mcmc-と診断">推論 (MCMC) と診断</a></li>
+  <li><a href="#層フィルタリングhdi-rope-roi分析" id="toc-層フィルタリングhdi-rope-roi分析" class="nav-link" data-scroll-target="#層フィルタリングhdi-rope-roi分析">３層フィルタリング(HDI, ROPE, ROI)分析</a>
+  <ul class="collapse">
+  <li><a href="#推論結果とコスト構造の動的ロードシミュレーション" id="toc-推論結果とコスト構造の動的ロードシミュレーション" class="nav-link" data-scroll-target="#推論結果とコスト構造の動的ロードシミュレーション">推論結果とコスト構造の動的ロード・シミュレーション</a></li>
+  <li><a href="#年02月-出店売上コスト予測表-rope判定付" id="toc-年02月-出店売上コスト予測表-rope判定付" class="nav-link" data-scroll-target="#年02月-出店売上コスト予測表-rope判定付">2026年02月 出店売上・コスト予測表 (ROPE判定付)</a></li>
+  <li><a href="#年02月-最適出店ロケーションの戦略提案" id="toc-年02月-最適出店ロケーションの戦略提案" class="nav-link" data-scroll-target="#年02月-最適出店ロケーションの戦略提案">2026年02月 最適出店ロケーションの戦略提案</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">階層ベイズ線形回帰によるマルシェ出店地点別の売上予測</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="エグゼクティブサマリー" class="level2">
+<h2 class="anchored" data-anchor-id="エグゼクティブサマリー">エグゼクティブサマリー</h2>
+<p>過去12件の出店データに基づき、階層ベイズモデルを用いて地点ごとの - 売上ポテンシャル - 天候リスク</p>
+<p>を分離・評価しました。単純な平均値では判断できない「不確実性（リスク）」を可視化 し、ROI（投資対効果）に基づいた戦略的な判断材料を提供します。</p>
+</section>
+<section id="事前準備" class="level2">
+<h2 class="anchored" data-anchor-id="事前準備">事前準備</h2>
+<p>確率モデルの構築やデータ分析に必要なライブラリのインポートや独自カラー定義を行います。</p>
+<div id="8f0dcedbbcfc15a6" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:03.254261Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:03.239417Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 必要なライブラリの読み込み</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 不要な出力をしないように制御</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="e1a6b3139e32d9ce" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:07.366454Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:07.347463Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># プロジェクト共通のカラー定義</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>COLOR_PURPLE <span class="op">=</span> <span class="st">"#985DE5"</span>  <span class="co"># 事後分布・HDI</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>COLOR_YELLOW <span class="op">=</span> <span class="st">"#F9C74F"</span>  <span class="co"># ROPE 領域</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>COLOR_GREEN  <span class="op">=</span> <span class="st">"#06D6A0"</span>  <span class="co"># 改善判定</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>COLOR_RED    <span class="op">=</span> <span class="st">"#EF476F"</span>  <span class="co"># 悪化判定</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>COLOR_GRAY   <span class="op">=</span> <span class="st">"#8D99AE"</span>  <span class="co"># 等価判定・参照線</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.rcdefaults()  <span class="co"># plt の現在のカラー定義をリセット</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>palette_brand <span class="op">=</span> [COLOR_PURPLE, COLOR_YELLOW, COLOR_GREEN, COLOR_RED, COLOR_GRAY]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>, palette<span class="op">=</span>palette_brand)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"axes.prop_cycle"</span>] <span class="op">=</span> plt.cycler(color<span class="op">=</span>palette_brand)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Brand Style Applied: The visual identity was applied."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Brand Style Applied: The visual identity was applied.</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<h5 id="tips" class="anchored">Tips:</h5>
+<p>分析結果のビジュアルを統一し、どのグラフを見ても「紫は実力、緑は成功」と直感的に理解できるようにしています。 Color Cycle グラフを描画する際、色が指定されていない場合に自動的に適用される色の順番です。 最初は紫、次を黄色…と決めておくことで、毎回指定しなくても色が揃います。</p>
+<p>ビジネスレポートにおいて「色の意味」を固定することは、意思決定のスピードを高めます。 複数の Notebook を管理する実務現場では、これを共通モジュール化し、メンテナンス姓を高めることを推奨します。</p>
+<p>１番大事なことですが、<strong>自分のお気に入りの配色にするとバイブス</strong>が上がります。</p>
+</blockquote>
+</section>
+<section id="データの準備とホワイトボックス化" class="level2">
+<h2 class="anchored" data-anchor-id="データの準備とホワイトボックス化">データの準備とホワイトボックス化</h2>
+<p>分析の原材料となるデータの読み込み、集計可能な数値型へ変換します。 今回は、１年分の簡単なデータが CSV で記録してあった、とします。</p>
+<div id="b32427cef8555f86" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:09.515691Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:09.371695Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># データの読み込み（外部データより読み込み）</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>PATH_ROW_DATA <span class="op">=</span> <span class="st">"sales_performance.csv"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df_raw <span class="op">=</span> pd.read_csv(PATH_ROW_DATA)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df_raw</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Opening_DateTime</th>
+<th data-quarto-table-cell-role="th">Location</th>
+<th data-quarto-table-cell-role="th">Weather</th>
+<th data-quarto-table-cell-role="th">Sales(sales_obs)</th>
+<th data-quarto-table-cell-role="th">Fixed_Costs</th>
+<th data-quarto-table-cell-role="th">Commission_Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2025-04-12 08:00-17:00</td>
+<td>A: StationSquare</td>
+<td>Sunny</td>
+<td>73,900</td>
+<td>45,000</td>
+<td>0.10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2025-06-20 08:00-17:00</td>
+<td>A: StationSquare</td>
+<td>rain</td>
+<td>17,100</td>
+<td>45,000</td>
+<td>0.10</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2025-12-15 08:00-17:00</td>
+<td>A: StationSquare</td>
+<td>Cloudy</td>
+<td>38,500</td>
+<td>45,000</td>
+<td>0.10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2025-05-10 08:00-17:00</td>
+<td>B: ParkStreet</td>
+<td>rain</td>
+<td>17,300</td>
+<td>30,000</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2025-08-05 08:00-17:00</td>
+<td>B: ParkStreet</td>
+<td>Sunny</td>
+<td>84,000</td>
+<td>30,000</td>
+<td>0.05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>2025-10-25 08:00-17:00</td>
+<td>B: ParkStreet</td>
+<td>Cloudy</td>
+<td>40,500</td>
+<td>30,000</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>2025-07-15 08:00-17:00</td>
+<td>C: Shopping mall</td>
+<td>Sunny</td>
+<td>90,500</td>
+<td>55,000</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>2025-11-02 08:00-17:00</td>
+<td>C: Shopping mall</td>
+<td>rain</td>
+<td>14,400</td>
+<td>55,000</td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>2025-01-20 08:00-17:00</td>
+<td>C: Shopping mall</td>
+<td>Cloudy</td>
+<td>39,100</td>
+<td>55,000</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>2025-03-25 08:00-17:00</td>
+<td>D: TempleGrounds</td>
+<td>Cloudy</td>
+<td>51,700</td>
+<td>35,000</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>2025-09-12 08:00-17:00</td>
+<td>D: TempleGrounds</td>
+<td>Sunny</td>
+<td>72,300</td>
+<td>35,000</td>
+<td>0.05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>2025-02-10 08:00-17:00</td>
+<td>D: TempleGrounds</td>
+<td>rain</td>
+<td>13,600</td>
+<td>35,000</td>
+<td>0.05</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="d1e793aba7f15286" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:11.313943Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:11.251673Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 数値変換のクレンジング</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"sales_obs"</span>] <span class="op">=</span> df_raw[<span class="st">"Sales(sales_obs)"</span>].<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">""</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"cost_fixed"</span>] <span class="op">=</span> df_raw[<span class="st">"Fixed_Costs"</span>].<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">""</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"rate_commission"</span>] <span class="op">=</span> df_raw[<span class="st">"Commission_Rate"</span>]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 読み込み直後のデータ確認</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sales_obs</th>
+<th data-quarto-table-cell-role="th">cost_fixed</th>
+<th data-quarto-table-cell-role="th">rate_commission</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>73900.0</td>
+<td>45000.0</td>
+<td>0.10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>17100.0</td>
+<td>45000.0</td>
+<td>0.10</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>38500.0</td>
+<td>45000.0</td>
+<td>0.10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>17300.0</td>
+<td>30000.0</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>84000.0</td>
+<td>30000.0</td>
+<td>0.05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>40500.0</td>
+<td>30000.0</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>90500.0</td>
+<td>55000.0</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>14400.0</td>
+<td>55000.0</td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>39100.0</td>
+<td>55000.0</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>51700.0</td>
+<td>35000.0</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>72300.0</td>
+<td>35000.0</td>
+<td>0.05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>13600.0</td>
+<td>35000.0</td>
+<td>0.05</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>データクレンジングとは、カンマや型不整合などのノイズを取り除き、統計モデルが計算できる形に 整える工程です。</p>
+<blockquote class="blockquote">
+<h5 id="tips-1" class="anchored">tips:</h5>
+<p>生データのことを Raw Data と言います。よって <code>df_raw</code> という変数名にしています。</p>
+<p>データを <code>raw</code> のまま保持することには以下のメリットがあります。 1. 再現性の確保 - 前処理のコード（洗浄工程）に間違いが見つかった際、いつでも初期状態の <code>df_raw</code> からやり直すことができます。 2. ベイズ推論への橋渡し - PyMC5 での実装では、文字列（場所など）を数値インデックス（0, 1, 2, …）に変換する工程が必須です。 <code>df_raw</code> を残しておくことで、「インデックス０番はどの場所だったか？」という対応関係（Coords / Dims）をいつでも参照できます。</p>
+</blockquote>
+<div id="27b372ff0f1f618a" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:14.210634Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:14.181227Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df_raw.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Commission_Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>12.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>0.087500</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>0.043301</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.050000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>0.050000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>0.075000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>0.112500</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>0.150000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="特徴量生成とインデックス化" class="level2">
+<h2 class="anchored" data-anchor-id="特徴量生成とインデックス化">特徴量生成とインデックス化</h2>
+<p>「場所」や「天気」といった文字情報を、数式で扱える「背番号（インデックス）」に変換します。 また、日付から「季節」という売上に影響する重要な文脈を抽出します。</p>
+<div id="e7681b7428ae916f" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:16.365485Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:16.339739Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 季節情報の抽出</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"opening_datetime"</span>] <span class="op">=</span> pd.to_datetime(df_raw[<span class="st">"Opening_DateTime"</span>].<span class="bu">str</span>.split(<span class="st">" "</span>).<span class="bu">str</span>[<span class="dv">0</span>])</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"idx_month"</span>] <span class="op">=</span> df[<span class="st">"opening_datetime"</span>].dt.month</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="34c23430c15dc30a" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:17.304046Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:17.296804Z&quot;}" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> define_season(month: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    与えられた月に基づいて季節を決定します。この関数は入力された月を評価し、春、夏、秋、冬の4つの季節のいずれかに分類します。</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    :param month: 整数で表された月 (1 月は 1、2 月は 2、...、12 月は 12)。</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">    :type month: int</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    :return: 指定された月に対応する季節の名前。</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    :rtype: str</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> month <span class="kw">in</span> [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]: <span class="cf">return</span> <span class="st">"Spring"</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> month <span class="kw">in</span> [<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>]: <span class="cf">return</span> <span class="st">"Summer"</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> month <span class="kw">in</span> [<span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">11</span>]: <span class="cf">return</span> <span class="st">"Autumn"</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Winter"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d6963365e6b90648" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:18.373040Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:18.352556Z&quot;}" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"season_label"</span>] <span class="op">=</span> df[<span class="st">"idx_month"</span>].<span class="bu">apply</span>(define_season)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sales_obs</th>
+<th data-quarto-table-cell-role="th">cost_fixed</th>
+<th data-quarto-table-cell-role="th">rate_commission</th>
+<th data-quarto-table-cell-role="th">opening_datetime</th>
+<th data-quarto-table-cell-role="th">idx_month</th>
+<th data-quarto-table-cell-role="th">season_label</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>73900.0</td>
+<td>45000.0</td>
+<td>0.10</td>
+<td>2025-04-12</td>
+<td>4</td>
+<td>Spring</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>17100.0</td>
+<td>45000.0</td>
+<td>0.10</td>
+<td>2025-06-20</td>
+<td>6</td>
+<td>Summer</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>38500.0</td>
+<td>45000.0</td>
+<td>0.10</td>
+<td>2025-12-15</td>
+<td>12</td>
+<td>Winter</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>17300.0</td>
+<td>30000.0</td>
+<td>0.05</td>
+<td>2025-05-10</td>
+<td>5</td>
+<td>Spring</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>84000.0</td>
+<td>30000.0</td>
+<td>0.05</td>
+<td>2025-08-05</td>
+<td>8</td>
+<td>Summer</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>40500.0</td>
+<td>30000.0</td>
+<td>0.05</td>
+<td>2025-10-25</td>
+<td>10</td>
+<td>Autumn</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>90500.0</td>
+<td>55000.0</td>
+<td>0.15</td>
+<td>2025-07-15</td>
+<td>7</td>
+<td>Summer</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>14400.0</td>
+<td>55000.0</td>
+<td>0.15</td>
+<td>2025-11-02</td>
+<td>11</td>
+<td>Autumn</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>39100.0</td>
+<td>55000.0</td>
+<td>0.15</td>
+<td>2025-01-20</td>
+<td>1</td>
+<td>Winter</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>51700.0</td>
+<td>35000.0</td>
+<td>0.05</td>
+<td>2025-03-25</td>
+<td>3</td>
+<td>Spring</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>72300.0</td>
+<td>35000.0</td>
+<td>0.05</td>
+<td>2025-09-12</td>
+<td>9</td>
+<td>Autumn</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>13600.0</td>
+<td>35000.0</td>
+<td>0.05</td>
+<td>2025-02-10</td>
+<td>2</td>
+<td>Winter</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="15c0a706d8d41b42" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:20.001348Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:19.993216Z&quot;}" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># カテゴリのインデックス化</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"idx_location"</span>], locations <span class="op">=</span> pd.factorize(df_raw[<span class="st">"Location"</span>])</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"idx_weather"</span>], weathers <span class="op">=</span> pd.factorize(df_raw[<span class="st">"Weather"</span>])</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"idx_season"</span>], seasons <span class="op">=</span> pd.factorize(df[<span class="st">"season_label"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>pd.factorize()</code> は、ユニークな文字列に対して一意の整数を割り当てるラベルエンコーディング手法です。</p>
+<div id="7e742d216d47f437" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:22.062705Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:22.053369Z&quot;}" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PyMC用座標定義</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: locations,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"weather"</span>: weathers,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"season"</span>: seasons,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id_obs"</span>: np.arange(<span class="bu">len</span>(df))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Location Map: </span><span class="sc">{</span><span class="bu">list</span>(<span class="bu">enumerate</span>(locations))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Weather Map: </span><span class="sc">{</span><span class="bu">list</span>(<span class="bu">enumerate</span>(weathers))<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Season Map: </span><span class="sc">{</span><span class="bu">list</span>(<span class="bu">enumerate</span>(seasons))<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Location Map: [(0, 'A: StationSquare'), (1, 'B: ParkStreet'), (2, 'C: Shopping mall'), (3, 'D: TempleGrounds')]
+Weather Map: [(0, 'Sunny'), (1, 'rain'), (2, 'Cloudy')]
+Season Map: [(0, 'Spring'), (1, 'Summer'), (2, 'Winter'), (3, 'Autumn')]</code></pre>
+</div>
+</div>
+<p>「名前」ではなく「ID」で呼ぶようにします。あとで名簿（<code>locations</code>等）と突き合わせれば、誰が誰だか分かります。</p>
+</section>
+<section id="確率モデルの構築" class="level2">
+<h2 class="anchored" data-anchor-id="確率モデルの構築">確率モデルの構築</h2>
+<p>売上に影響を与える「立地」「天気」「季節」を独立した変数として扱い、それぞれの影響度をベイズ線形回帰の枠組みで推定します。</p>
+<div id="61cb31c6c66ce25f" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:25.967133Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:25.900587Z&quot;}" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> hierarchical_bayesian_linear_regression_model:</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 入力データ</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    idx_location <span class="op">=</span> pm.Data(<span class="st">"idx_location"</span>, df[<span class="st">"idx_location"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)  <span class="co"># 各観測データに対応する地点ID</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    idx_weather <span class="op">=</span> pm.Data(<span class="st">"idx_weather"</span>, df[<span class="st">"idx_weather"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)  <span class="co"># 各観測データに対応する天候ID</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    idx_season <span class="op">=</span> pm.Data(<span class="st">"idx_season"</span>, df[<span class="st">"idx_season"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)  <span class="co"># 各観測データに対応する季節ID</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Data(<span class="st">"y_obs"</span>, df[<span class="st">"sales_obs"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)  <span class="co"># モデルが学習する売上の実測値</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Priors（事前分布A）---</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 全体のベースライン（log scale）: e^11 ≒ 6万円</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    mu_global <span class="op">=</span> pm.Normal(<span class="st">"mu_global"</span>, mu<span class="op">=</span><span class="dv">11</span>, sigma<span class="op">=</span><span class="dv">2</span>)  <span class="co"># 全地点を通じた平均売上のベースライン（Log単位）</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    sigma_global <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma_global"</span>, sigma<span class="op">=</span><span class="dv">1</span>)  <span class="co"># 地点間で「実力」がどれくらいバラつくかの標準偏差</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Hierarchical Structure (Non-centered) ---</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 地点ごとの偏差。各地点の力を共通分布からのズレとして定義</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    offset_location <span class="op">=</span> pm.Normal(<span class="st">"offset_location"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"location"</span>)  <span class="co"># 標準正規分布からの地点ごとのズレ（非中心化用）</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> pm.Deterministic(<span class="st">"alpha"</span>, mu_global <span class="op">+</span> offset_location <span class="op">*</span> sigma_global, dims<span class="op">=</span><span class="st">"location"</span>)  <span class="co"># 地点ごとの固有の売上実力</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Fixed Effects (回帰係数)---</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    beta_weather <span class="op">=</span> pm.Normal(<span class="st">"beta_weather"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.5</span>, dims<span class="op">=</span><span class="st">"weather"</span>)  <span class="co"># 天候が売上を何%増減させるかの影響度（傾き）</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    beta_season <span class="op">=</span> pm.Normal(<span class="st">"beta_season"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.5</span>, dims<span class="op">=</span><span class="st">"season"</span>)  <span class="co"># 季節が売上を何%増減させるかの影響度（傾き）</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Likelihood (尤度関数)---</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 対数スケールで線形予測子</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> alpha[idx_location] <span class="op">+</span> beta_weather[idx_weather] <span class="op">+</span> beta_season[idx_season]  <span class="co"># 各要素を足し合わせた予測売上の中央値（log単位）</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma"</span>, sigma<span class="op">=</span><span class="dv">1</span>)  <span class="co"># モデルでは説明しきれない観測誤差 (ノイズ)</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    pm.LogNormal(<span class="st">"sales"</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_obs, dims<span class="op">=</span><span class="st">"id_obs"</span>)  <span class="co"># 売上の正値性と裾の長さを考慮した最終的な確率分布</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="3ad7785e069d79a7" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:27.828239Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:27.590805Z&quot;}" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># モデルの構造の可視化</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(hierarchical_bayesian_linear_regression_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+<figure class="figure">
+<p><img src="hierarchical_baysian_linear_regression_files/figure-html/cell-13-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="結果の解釈" class="level3">
+<h3 class="anchored" data-anchor-id="結果の解釈">結果の解釈</h3>
+<section id="ビジネス上の意味" class="level4">
+<h4 class="anchored" data-anchor-id="ビジネス上の意味">ビジネス上の意味</h4>
+<p>このモデルによって、 - 雨の日でも売上が落ちにくい地点 - 特定の季節に強い地点</p>
+<p>をデータが少ない中でもあぶりだそうとしています。季節ごとの人員配置や、天候による在庫リスク管理の精度を直接的に向上させ、無駄なコストを削減（ROIの向上）することに期待しています。</p>
+<blockquote class="blockquote">
+<h5 id="tips-2" class="anchored">Tips</h5>
+<h6 id="非中心化パラメータ化-non-centered-parameterization" class="anchored">非中心化パラメータ化 (Non-centered parameterization)</h6>
+<p>階層モデルにおいて <code>offset</code> を介して間接的に個別のパラメータ (<code>alpha</code>) を定義しています。 立地の売上をそのまま予測するのではなく、「全体の売上平均」と「そこからの立地の偏差値（ズレ）」に分けて計算するようなのです。 データが少ない地点でも、平均からのズレとして測ることで、予測が極端に外れるのを防げます。</p>
+</blockquote>
+</section>
+<section id="統計的根拠と分布の選択" class="level4">
+<h4 class="anchored" data-anchor-id="統計的根拠と分布の選択">統計的根拠と分布の選択</h4>
+<section id="対数正規分布-lognormal" class="level5">
+<h5 class="anchored" data-anchor-id="対数正規分布-lognormal">対数正規分布 (LogNormal)</h5>
+<p>売上データは「100万円の次は 120万円」といった「割合」で動くことが多く、またマイナスの売上は存在しません。そのため、対数をとると正規分布になる対数正規分布を選択しました。 - <span class="math inline">\(\mu \sim Normal(11, 2^2)\)</span> &gt; 事前分布を最初から対数スケールの数値(11付近)で定義しておくことで、モデル全体が正しく「対数スケールの線形回帰」として機能します。 &gt; &gt; 売上実績データの <code>sales_obs</code> は、おおよそ 40,000円～100,000円の範囲にあります。これを自然対数 (ln) に変換すると以下のようになります。 &gt; - <span class="math inline">\(\ln(40,000) \approx 10.6\)</span> &gt; - <span class="math inline">\(\ln(100,000) \approx 11.5\)</span> &gt; &gt; コード内で <code>mu_global</code> の平均 (<code>mu</code>) を 11 に設定しているのは、「売上の中心が <span class="math inline">\(e^{11} \approx 60,000\)</span> 円くらいである」という事前知識を対数スケールで表現していることになります。 &gt; もし、ここを <code>mu=60_000</code> としてしまうと、後の <code>LogNormal</code> 尤度 (Likelihood) と整合が取れず、計算が破綻します。</p>
+</section>
+<section id="事前分布の選択" class="level5">
+<h5 class="anchored" data-anchor-id="事前分布の選択">事前分布の選択</h5>
+<p><code>beta_weather</code> や <code>beta_season</code> に　<code>Normal(0, 0.5)</code> を指定しています。</p>
+<ul>
+<li><span class="math inline">\(\beta_{\text{weather}} \sim Normal(0, 0.5^2)\)</span></li>
+<li><span class="math inline">\(\beta_{\text{season}} \sim Normal(0, 0.5^2)\)</span></li>
+</ul>
+<p>これは、対数スケールで ±0.5 (約0.6倍～1.6倍) 程度の変動が「もっともらしい」という、ビジネス感覚に近い弱情報事前分布 (Weakly Informative Prior) です。</p>
+<blockquote class="blockquote">
+<h5 id="対数正規分布" class="anchored">対数正規分布</h5>
+<p>変数 <span class="math inline">\(x\)</span> の対数 <span class="math inline">\(ln(x)\)</span> が正規分布に従う確率分布。正の値のみを取り、右側に長い裾（ロングテール）を持つのが特徴です。 「掛け算で決まる世界」の分布、というイメージで今回のように「客数 × 客単価」のように要素が掛け合わさって決まるため、平均的な日よりも「たまに大爆発する日」が出やすくなります。 正規分布（足し算の世界）ではこの「大爆発」を予測できません。</p>
+</blockquote>
+<blockquote class="blockquote">
+<h5 id="弱情報事前分布-weakly-informative-prior" class="anchored">弱情報事前分布 (Weakly Informative Prior)</h5>
+<p>ベイズ統計において - 実務的な妥当性 - データの尊重</p>
+<p>を両立させるための非常に賢いテクニックです。</p>
+<p>パラメータが取り得る「物理的・実務的に妥当な範囲」を緩やかに指定する分布です。 モデルが計算不能な極端な値（異常な高値や負の値A）に迷い込むのを防ぎつつ、十分なデータがあればそのデータの結果を優先するように設計されます。</p>
+<p>「経験上、売上はこのくらいになるはずだ（常識）」という意見は持っていますが、新しいデータが来れば柔軟に意見を変えることができ、ちょうど良いバランスの姿勢を持っているイメージです。</p>
+<p>分析者が「データを分析する前」に持っている知識の強さを、３つのパターンで可視化してみます。今回の売上予測モデルで <span class="math inline">\(Normal(11, 2^2)\)</span> を選んだ意図を明確にします。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img_weakly_info_prior.jpg" class="img-fluid figure-img"></p>
+<figcaption>事前分布の比較シミュレーション</figcaption>
+</figure>
+</div>
+<p>今回のモデルで<strong>弱情報事前分布</strong> を採用した理由は３つあります。 1. <strong>正規化 (過学習の抑制)</strong>: データが極端に少ない地点 (12件中の数件)でも、推定値が「無限大」や「ゼロ」に飛んでしまうのを防ぎます。 2. <strong>計算の安定化</strong>: 完全にフラットな「無情報分布」を使うと、MCMCサンプリングが広大な範囲を探索しすぎて計算が終わらなくなることがありますが、弱情報事前分布は探索範囲を「現実的な場所」に絞り込みます。 3. <strong>対数スケールへの適合</strong>: 売上を対数 (log) で扱う場合、平均 <code>11</code>　に対して標準偏差 <code>2</code> という設定は、元データのスケールで「数千円～数千万円」という広い範囲をカバーします。これは「常識外れな予測はしないが、可能性は広く残す」という理想的な設定です。</p>
+<p>SMB市場のような「スモールデータ」の環境では、<strong>無情報分布 (何も知らない)</strong> はむしろ危険になります。データが少ないと、たまたま起きたノイズを「真実」だと誤認してしまいます。</p>
+<p>弱情報事前分布を組み込むことで、<strong>「過去の業界常識 (事前知識)」と「目の前の実績 (データ)」を数学的に正しく合算 (ベイズ更新)</strong> でき、少ないデータからでもリスクの低い投資判断を下すことが可能になります。</p>
+</blockquote>
+<blockquote class="blockquote">
+<h6 id="tips-3" class="anchored">Tips</h6>
+<p>もし「前回のキャンペーンでは売上が1.5倍になった」という確固たる過去の証拠がある場合は、弱情報から少し「強情報（SDを小さくする）」に寄せることで、より精度の高い予測が可能になります</p>
+</blockquote>
+</section>
+</section>
+</section>
+</section>
+<section id="推論-mcmc-と診断" class="level2">
+<h2 class="anchored" data-anchor-id="推論-mcmc-と診断">推論 (MCMC) と診断</h2>
+<ul>
+<li>サンプル数が少ないこと</li>
+<li>構築したモデルが複雑であること</li>
+</ul>
+<p>を考えると一度の推論で発散せずにモデルが安定しない確度が高いです。 MCMCサンプリングは計算負荷が高いため <strong>「成功した（発散がない）結果だけをキャッシュ（保存）し、次回はそれを再利用する」</strong> という関数を組みます。</p>
+<div id="97d51cf5d063c702" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:39.862699Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:39.841254Z&quot;}" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_inference_with_cache(path, model, draw, tune, chains, target_accept, random_seed):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(path):</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 保存された .nc ファイルがある場合はロード</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Inference: Checked for existing inference results, Loading from </span><span class="sc">{</span>path<span class="sc">}</span><span class="ss"> ..."</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        inference <span class="op">=</span> az.from_netcdf(path)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> inference</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># .nc ファイルがない場合のみ推論を実行</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Inference: No inference results found, so we will start sampling. This may take a few minutes."</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> model:</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>            inference <span class="op">=</span> pm.sample(draw<span class="op">=</span>draw,  <span class="co"># 事後分布から取得・記録する有効なサンプル数</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                                  tune<span class="op">=</span>tune,  <span class="co"># 調整用（バーンイン）として捨てる初期ステップ数</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                                  chains<span class="op">=</span>chains,  <span class="co"># 独立した計算経路（鎖）を並行して回す数</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                                  target_accept<span class="op">=</span>target_accept,  <span class="co"># アルゴリズムの慎重さ（高めるほど計算エラーを防ぐ）</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>                                  random_seed<span class="op">=</span>random_seed)  <span class="co"># 計算結果の再現性を確保するための乱数固定</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>            <span class="co"># --- 発散 (Divergences) のチェック ---</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>            <span class="co"># total_divergences = inference.sample_stats.divergiing の合計が 0 ならば「成功」とみなす</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>            total_divergences <span class="op">=</span> inference.sample_stats.diverging.<span class="bu">sum</span>().item()</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> total_divergences <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 推論が成功 (発散がゼロ)した場合のみ保存</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>                inference.to_netcdf(path)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Inference: Sampling successful with zero divergences. saved to </span><span class="sc">{</span>path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> inference</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 発散が発生した場合は保存せずに警告を出す</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Warning: </span><span class="sc">{</span>total_divergences<span class="sc">}</span><span class="ss"> divergences occurred during sampling."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>構築したモデルと関数で推論を行います。 まず、 - <code>draw=2000</code> - <code>tune=1000</code> - <code>chains=4</code> - <code>target_accept=0.95</code></p>
+<p>に設定して推論を行います。</p>
+<blockquote class="blockquote">
+<h4 id="引数の設定値の根拠" class="anchored">引数の設定値の根拠</h4>
+<h5 id="なぜ-draws2000-なのか" class="anchored">なぜ draws=2000 なのか？</h5>
+<p>ベイズ推定では、期待値だけでなく「裾野（リスク）」を評価することが重要です。 特に今回のような ROI（投資対効果） を算出する場合、2000サンプル程度確保することで、94% HDI（確信区間）の端の方まで安定して推定できるようになります。</p>
+<h5 id="なぜ-target_accept0.95-高めなのか" class="anchored">なぜ target_accept=0.95 （高め）なのか？</h5>
+<p>今回のモデルは 「階層ベイズ（Hierarchical Model）」 です。 階層モデルは、地点ごとの個性が強い場合に「じょうご（Funnel）」のような非常に鋭い谷間を持つ地形になりやすく、標準設定（0.8）ではサンプリングが「発散（Divergence）」しやすくなります。 「慎重さ」を 0.95 まで高めることで、この鋭い谷間も取りこぼさずに探索させ、モデル診断におけるエラーを未然に防いでいます。</p>
+</blockquote>
+<div id="3a10b47cc6d8f257" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:57:46.424587Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:46.416976Z&quot;}" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>PATH_INFERENCE <span class="op">=</span> <span class="st">"inference_hierarchical_bayesian_linear_regression_failed.nc"</span>  <span class="co"># 推論結果を保存するファイル名</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="6ee76c5d36bb2b20" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T12:58:47.075778Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T12:57:50.245526Z&quot;}" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>inference <span class="op">=</span> run_inference_with_cache(PATH_INFERENCE,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                                     hierarchical_bayesian_linear_regression_model,  <span class="co"># 構築したモデル</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                                     draw<span class="op">=</span><span class="dv">2000</span>,  <span class="co"># 事後分布から取得・記録する有効なサンプル数</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                     tune<span class="op">=</span><span class="dv">1000</span>,  <span class="co"># 調整用（バーンイン）として捨てる初期ステップ数</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                                     chains<span class="op">=</span><span class="dv">4</span>,  <span class="co"># 独立した計算経路（鎖）を並行して回す数</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                                     target_accept<span class="op">=</span><span class="fl">0.95</span>,  <span class="co"># アルゴリズムの慎重さ（高めるほど計算エラーを防ぐ）</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                                     random_seed<span class="op">=</span><span class="dv">42</span>)  <span class="co"># 計算結果の再現性を確保するための乱数固定</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference: No inference results found, so we will start sampling. This may take a few minutes.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [mu_global, sigma_global, offset_location, beta_weather, beta_season, sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major":2,"version_minor":0,"model_id":"7530a4fa009849bbb48c83884dac092f","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 53 seconds.
+There were 3 divergences after tuning. Increase `target_accept` or reparameterize.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Warning: 3 divergences occurred during sampling.</code></pre>
+</div>
+</div>
+<p>3件の発散 (Divergences) が発生しました。原因として - データが少な過ぎる - 坂道 (勾配) が急すぎてサンプラーが滑落している</p>
+<p>と推測されます。</p>
+<p><span class="math inline">\(N=12\)</span> という極小データで「地点・天候・季節」のすべてを推定しようとすると、事後分布の計上が非常に鋭い「じょうご型（Funnel）」になり、発散が置きやすくなります。 モデルの記述をより「堅牢」にしチューニングしてみます。</p>
+<blockquote class="blockquote">
+<h5 id="divergence-発散" class="anchored">Divergence (発散)</h5>
+<p>ハミルトニアンモンテカルロ法において、計算上のエネルギー保存則が破綻し、シミュレーションが無限遠へ飛んでしまう現象。 <strong>「計算上の足踏み外し」</strong>というイメージです。急な坂道（事後分布の鋭い谷）を大股で歩こうとして、バランスを崩して滑落してしまった状態を指します。</p>
+</blockquote>
+<blockquote class="blockquote">
+<h5 id="ess-有効サンプルサイズが小さい" class="anchored">ESS (有効サンプルサイズ)が小さい</h5>
+<p>自己相関を考慮した際、実質的に独立していると見なせるサンプル数です。 <strong>「意見の多様性」</strong> のようなイメージで、仮に 2000回サンプリングしても、ESS が低いというとは「同じような似た意見ばかりが連続している」状態で、分布の全容 (真実) を捉え切れていないことを意味します。</p>
+</blockquote>
+<div id="c8055b2ffc06f306" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:13:29.159858Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:13:29.103837Z&quot;}" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># モデルのチューニング</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> hierarchical_bayesian_linear_regression_model_refined:</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Data Contains ---</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    idx_location <span class="op">=</span> pm.Data(<span class="st">"idx_location"</span>, df[<span class="st">"idx_location"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    idx_weather <span class="op">=</span> pm.Data(<span class="st">"idx_weather"</span>, df[<span class="st">"idx_weather"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    idx_season <span class="op">=</span> pm.Data(<span class="st">"idx_season"</span>, df[<span class="st">"idx_season"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Data(<span class="st">"y_obs"</span>, df[<span class="st">"sales_obs"</span>], dims<span class="op">=</span><span class="st">"id_obs"</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Priors: 弱情報事前分布をさらに「タイト」にする ---</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sigma (標準偏差) が広すぎると、データ不足の時に発散の原因になります</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    mu_global <span class="op">=</span> pm.Normal(<span class="st">"mu_global"</span>, mu<span class="op">=</span><span class="fl">10.8</span>, sigma<span class="op">=</span><span class="dv">1</span>)  <span class="co"># sigma を 2 から 1 へ (探索範囲を現実的に絞る)</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    sigma_global <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma_global"</span>, sigma<span class="op">=</span><span class="fl">0.5</span>)  <span class="co"># 地点間の差を「あり得ないほど大きく」しない</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Hierarchical (Non-centered) ---</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    offset_location <span class="op">=</span> pm.Normal(<span class="st">"offset_location"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"location"</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> pm.Deterministic(<span class="st">"alpha"</span>, mu_global <span class="op">+</span> offset_location <span class="op">*</span> sigma_global, dims<span class="op">=</span><span class="st">"location"</span>)</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Fixed Effects: 正規化を強める ---</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 天候や季節が「売上を３倍にする」といった極端な予測を抑制します</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    beta_weather <span class="op">=</span> pm.Normal(<span class="st">"beta_weather"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">1.0</span>, dims<span class="op">=</span><span class="st">"weather"</span>)  <span class="co"># 天候の影響 (雨 = -1.2) を許容できるよう、sigma を 0.5 から 1.0 へ拡大</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    beta_season <span class="op">=</span> pm.Normal(<span class="st">"beta_season"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.5</span>, dims<span class="op">=</span><span class="st">"season"</span>)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Likelihood ---</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> alpha[idx_location] <span class="op">+</span> beta_weather[idx_weather] <span class="op">+</span> beta_season[idx_season]  <span class="co"># 観測ノイズの許容範囲を絞る</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma"</span>, sigma<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    pm.LogNormal(<span class="st">"sales"</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_obs, dims<span class="op">=</span><span class="st">"id_obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>今回の <span class="math inline">\(N=12\)</span> という「極小データ」に対して、パラメータ数が多い（地点・天候・季節など）モデルは、統計的には <strong>「オーバーフィッティング（過学習）」の一歩手前</strong> にあります。</p>
+<p>サンプラーは、「どのパラメータが原因でこの売上になったのか？」という特定に迷い、事後分布の中に「非常に細くて深い谷（じょうご）」を作ってしまいます。 &gt;<code>sigma</code> の引き締め: 「地点差」や「天候効果」が現実離れした大きさにならないよう制限をかけることで、谷の深さを和らげます。</p>
+<p>####　発散をゼロに抑えることと、戦略的意思決定への関係 1. HDI (統計的実証): 発散がある状態での HDI は、端が切り捨てられた「不正確な予報」です。発散を消すことで、初めて正確な 94% HDI が算出できます。 2. ROPE (実質的等価性): サンプラーの足腰が安定して初めて、微細な誤差と実務的なインパクト（ROPE）を正しく切り分けられます。 3. ROI (経済的評価): ESSが低いと「稀に起こる大赤字」を見逃すリスクがあります。十分なサンプリングにより、「最悪のシナリオ」を含めた純利益分布を描き出すことができます。</p>
+<div id="64c64de8ead1916e" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:16:39.704458Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:13:32.285658Z&quot;}" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 再度、推論</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>inference <span class="op">=</span> run_inference_with_cache(PATH_INFERENCE,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                                     hierarchical_bayesian_linear_regression_model_refined,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                                     draw<span class="op">=</span><span class="dv">2000</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                                     tune<span class="op">=</span><span class="dv">2000</span>,  <span class="co"># チューニング期間を倍増 (地形をじっくり学習させる)</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                                     chains<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                                     target_accept<span class="op">=</span><span class="fl">0.99</span>,  <span class="co"># 0.95 から 0.99 へ (一歩を極限まで小さく、慎重にする)</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                                     random_seed<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                     )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference: No inference results found, so we will start sampling. This may take a few minutes.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [mu_global, sigma_global, offset_location, beta_weather, beta_season, sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major":2,"version_minor":0,"model_id":"84769bcac54242548b69f27ef00d95fa","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 2_000 tune and 1_000 draw iterations (8_000 + 4_000 draws total) took 185 seconds.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference: Sampling successful with zero divergences. saved to inference_hierarchical_bayesian_linear_regression_failed.nc</code></pre>
+</div>
+</div>
+<p><code>target_accept=0.99</code>: 慎重さを極限まで高めることで、細い谷をさらに慎重に歩くようにしました。 チューニングの結果、今回は無事に発散せずに推論できた様子です。推論データを可視化して診断しています。</p>
+<div id="68c996f56aafc671" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-17T08:22:40.223639Z&quot;,&quot;start_time&quot;:&quot;2026-01-17T08:22:39.959264Z&quot;}" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>inference <span class="op">=</span> az.from_netcdf(PATH_INFERENCE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">FileNotFoundError</span>                         Traceback (most recent call last)
+<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[20]</span><span class="ansi-green-fg">, line 1</span>
+<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">1</span> inference = <span class="ansi-yellow-bg">az</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">from_netcdf</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">PATH_INFERENCE</span><span class="ansi-yellow-bg">)</span>
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/arviz/data/io_netcdf.py:36</span>, in <span class="ansi-cyan-fg">from_netcdf</span><span class="ansi-blue-fg">(filename, engine, group_kwargs, regex)</span>
+<span class="ansi-green-fg">     34</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> group_kwargs <span style="font-weight:bold;color:rgb(175,0,255)">is</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">     35</span>     group_kwargs = {}
+<span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">36</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">InferenceData</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">from_netcdf</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-fg">     37</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">filename</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">engine</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">engine</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">group_kwargs</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">group_kwargs</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">regex</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">regex</span>
+<span class="ansi-green-fg">     38</span> <span class="ansi-yellow-bg">)</span>
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/arviz/data/inference_data.py:456</span>, in <span class="ansi-cyan-fg">InferenceData.from_netcdf</span><span class="ansi-blue-fg">(filename, engine, group_kwargs, regex, base_group)</span>
+<span class="ansi-green-fg">    445</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> err.errno == -<span class="ansi-green-fg">101</span>:
+<span class="ansi-green-fg">    446</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="color:rgb(0,135,0)">type</span>(err)(
+<span class="ansi-green-fg">    447</span>         <span style="color:rgb(0,135,0)">str</span>(err)
+<span class="ansi-green-fg">    448</span>         + (
+<span class="ansi-green-fg">   (...)</span><span class="ansi-green-fg">    454</span>         )
+<span class="ansi-green-fg">    455</span>     ) <span style="font-weight:bold;color:rgb(0,135,0)">from</span><span style="color:rgb(188,188,188)"> </span><span class="ansi-blue-fg ansi-bold">err</span>
+<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">456</span> <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> err
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/arviz/data/inference_data.py:411</span>, in <span class="ansi-cyan-fg">InferenceData.from_netcdf</span><span class="ansi-blue-fg">(filename, engine, group_kwargs, regex, base_group)</span>
+<span class="ansi-green-fg">    405</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">ValueError</span>(
+<span class="ansi-green-fg">    406</span>         <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Invalid value for engine: </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>engine<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span class="ansi-yellow-fg">. Valid options are: h5netcdf or netcdf4</span><span class="ansi-yellow-fg">"</span>
+<span class="ansi-green-fg">    407</span>     )
+<span class="ansi-green-fg">    409</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">    410</span>     <span style="font-weight:bold;color:rgb(0,135,0)">with</span> (
+<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">411</span>         <span class="ansi-yellow-bg">h5netcdf</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">File</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">filename</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-fg ansi-yellow-bg">r</span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg">    412</span>         <span style="font-weight:bold;color:rgb(0,135,0)">if</span> engine == <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">h5netcdf</span><span class="ansi-yellow-fg">"</span>
+<span class="ansi-green-fg">    413</span>         <span style="font-weight:bold;color:rgb(0,135,0)">else</span> nc.Dataset(filename, mode=<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">r</span><span class="ansi-yellow-fg">"</span>)
+<span class="ansi-green-fg">    414</span>     ) <span style="font-weight:bold;color:rgb(0,135,0)">as</span> file_handle:
+<span class="ansi-green-fg">    415</span>         <span style="font-weight:bold;color:rgb(0,135,0)">if</span> base_group == <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">/</span><span class="ansi-yellow-fg">"</span>:
+<span class="ansi-green-fg">    416</span>             data = file_handle
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/h5netcdf/core.py:1660</span>, in <span class="ansi-cyan-fg">File.__init__</span><span class="ansi-blue-fg">(self, path, mode, format, invalid_netcdf, phony_dims, **kwargs)</span>
+<span class="ansi-green-fg">   1658</span>         <span style="color:rgb(0,135,0)">self</span>._preexisting_file = os.path.exists(path) <span style="font-weight:bold;color:rgb(175,0,255)">and</span> mode != <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">w</span><span class="ansi-yellow-fg">"</span>
+<span class="ansi-green-fg">   1659</span>         <span style="color:rgb(0,135,0)">self</span>._h5py = h5py
+<span class="ansi-green-fg">-&gt; </span><span class="ansi-green-fg">1660</span>         <span style="color:rgb(0,135,0)">self</span>.__h5file = <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_h5py</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">File</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-fg">   1661</span> <span class="ansi-yellow-bg">            </span><span class="ansi-yellow-bg">path</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">track_order</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">track_order</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">kwargs</span>
+<span class="ansi-green-fg">   1662</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg">   1663</span> <span style="font-weight:bold;color:rgb(0,135,0)">elif</span> <span style="color:rgb(0,135,0)">isinstance</span>(path, h5py.File):
+<span class="ansi-green-fg">   1664</span>     <span style="color:rgb(0,135,0)">self</span>._preexisting_file = mode <span style="font-weight:bold;color:rgb(175,0,255)">in</span> {<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">r</span><span class="ansi-yellow-fg">"</span>, <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">r+</span><span class="ansi-yellow-fg">"</span>, <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">a</span><span class="ansi-yellow-fg">"</span>}
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/h5py/_hl/files.py:566</span>, in <span class="ansi-cyan-fg">File.__init__</span><span class="ansi-blue-fg">(self, name, mode, driver, libver, userblock_size, swmr, rdcc_nslots, rdcc_nbytes, rdcc_w0, track_order, fs_strategy, fs_persist, fs_threshold, fs_page_size, page_buf_size, min_meta_keep, min_raw_keep, locking, alignment_threshold, alignment_interval, meta_block_size, track_times, **kwds)</span>
+<span class="ansi-green-fg">    557</span>     fapl = make_fapl(driver, libver, rdcc_nslots, rdcc_nbytes, rdcc_w0,
+<span class="ansi-green-fg">    558</span>                      locking, page_buf_size, min_meta_keep, min_raw_keep,
+<span class="ansi-green-fg">    559</span>                      alignment_threshold=alignment_threshold,
+<span class="ansi-green-fg">    560</span>                      alignment_interval=alignment_interval,
+<span class="ansi-green-fg">    561</span>                      meta_block_size=meta_block_size,
+<span class="ansi-green-fg">    562</span>                      **kwds)
+<span class="ansi-green-fg">    563</span>     fcpl = make_fcpl(track_order=track_order, track_times=track_times,
+<span class="ansi-green-fg">    564</span>                      fs_strategy=fs_strategy, fs_persist=fs_persist,
+<span class="ansi-green-fg">    565</span>                      fs_threshold=fs_threshold, fs_page_size=fs_page_size)
+<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">566</span>     fid = <span class="ansi-yellow-bg">make_fid</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">name</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">userblock_size</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">fapl</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">fcpl</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">swmr</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">swmr</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg">    568</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">isinstance</span>(libver, <span style="color:rgb(0,135,0)">tuple</span>):
+<span class="ansi-green-fg">    569</span>     <span style="color:rgb(0,135,0)">self</span>._libver = libver
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/petaLab/bayesian-iroha/.venv/lib/python3.11/site-packages/h5py/_hl/files.py:241</span>, in <span class="ansi-cyan-fg">make_fid</span><span class="ansi-blue-fg">(name, mode, userblock_size, fapl, fcpl, swmr)</span>
+<span class="ansi-green-fg">    239</span>     <span style="font-weight:bold;color:rgb(0,135,0)">if</span> swmr <span style="font-weight:bold;color:rgb(175,0,255)">and</span> swmr_support:
+<span class="ansi-green-fg">    240</span>         flags |= h5f.ACC_SWMR_READ
+<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">241</span>     fid = <span class="ansi-yellow-bg">h5f</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">name</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">flags</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">fapl</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">fapl</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg">    242</span> <span style="font-weight:bold;color:rgb(0,135,0)">elif</span> mode == <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">r+</span><span class="ansi-yellow-fg">'</span>:
+<span class="ansi-green-fg">    243</span>     fid = h5f.open(name, h5f.ACC_RDWR, fapl=fapl)
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">h5py/_objects.pyx:54</span>, in <span class="ansi-cyan-fg">h5py._objects.with_phil.wrapper</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">h5py/_objects.pyx:55</span>, in <span class="ansi-cyan-fg">h5py._objects.with_phil.wrapper</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">h5py/h5f.pyx:104</span>, in <span class="ansi-cyan-fg">h5py.h5f.open</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-red-fg">FileNotFoundError</span>: [Errno 2] Unable to synchronously open file (unable to open file: name = 'inference_hierarchical_bayesian_linear_regression_failed.nc', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)</pre>
+</div>
+</div>
+</div>
+<div id="43ac417456664cb5" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:18:29.454975Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:18:27.476229Z&quot;}" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 収束結果の可視化 (意思決定)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(inference, var_names<span class="op">=</span>[<span class="st">"alpha"</span>, <span class="st">"beta_weather"</span>, <span class="st">"beta_season"</span>], compact<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hierarchical_baysian_linear_regression_files/figure-html/cell-20-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>主要な説明変数の収束を「チェーン間の合意（Consensus）」という視点で確認します。</p>
+<ul>
+<li><code>compact=True</code> 全てのチェーンを同じグラフ上に重ね合わせて表示するように設定しています。</li>
+<li>左側の分布図で異なる色の線（各チェーン）が、ピタリと重なって「1つの山」を作っているかを確認します。 &gt;もし、線が分離している場合、チェーンごとに推論結果が異なっていることを意味し、収束失敗とみなしますが上手く収束していそうです。</li>
+<li>右側のトレース図で、全てのチェーンが同じ帯（範囲）の中に収まり、色が混ざり合って「太い1本の毛虫」に見えるかを確認します。 &gt;他のチェーンから大きく外れて動いている色が1つでもあれば、そのサンプリング結果は採用できませんが綺麗な毛虫状になっていそうです。</li>
+</ul>
+<div id="1417171f5361dec6" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:20:00.408037Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:19:59.637570Z&quot;}" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 収束結果の可視化 (健康診断)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(inference, var_names<span class="op">=</span>[<span class="st">"mu_global"</span>, <span class="st">"sigma_global"</span>, <span class="st">"sigma"</span>], compact<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hierarchical_baysian_linear_regression_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>モデルの構造を支配する変数が、どのチェーン（試行）においても等しく「定常状態」に達しているかを厳密にチェックします。</p>
+<ul>
+<li>こちらは、<code>compact=False</code> を設定して、各チェーンを縦に並べて表示し、個別の挙動を可視化しています。</li>
+<li>右側のトレース図を確認して、 各チェーンが特定の傾向（トレンド）を持たず、一定の範囲を細かく振動していれば、計算は安定していることになるので今回は大丈夫そうです。</li>
+</ul>
+<blockquote class="blockquote">
+<p>ここで収束が確認できない場合、そのモデルから得られる利益予測は「計算ミス」と同義であり、投資判断の材料にはなり得ないので注意が必要です。</p>
+</blockquote>
+<p>プロットによる視覚的確認を、数学的な指標で補強します。</p>
+<div id="dce1a71e022f660e" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:22:26.693637Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:22:26.567010Z&quot;}" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 収束指標（健康診断）の数値化</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>az.summary(inference,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>           var_names<span class="op">=</span>[</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"alpha"</span>, <span class="st">"beta_weather"</span>, <span class="st">"beta_season"</span>,  <span class="co"># 意思決定に関わる変数</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"mu_global"</span>, <span class="st">"sigma_global"</span>, <span class="st">"sigma"</span>,  <span class="co"># 推論の健康診断に関わる変数</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>           ],</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>           kind<span class="op">=</span><span class="st">"diagnostics"</span>  <span class="co"># 収束診断に特化した指標を抽出</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>           )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">mcse_mean</th>
+<th data-quarto-table-cell-role="th">mcse_sd</th>
+<th data-quarto-table-cell-role="th">ess_bulk</th>
+<th data-quarto-table-cell-role="th">ess_tail</th>
+<th data-quarto-table-cell-role="th">r_hat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">alpha[A: StationSquare]</td>
+<td>0.015</td>
+<td>0.009</td>
+<td>1350.0</td>
+<td>1872.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">alpha[B: ParkStreet]</td>
+<td>0.015</td>
+<td>0.009</td>
+<td>1344.0</td>
+<td>1866.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">alpha[C: Shopping mall]</td>
+<td>0.015</td>
+<td>0.009</td>
+<td>1343.0</td>
+<td>1743.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">alpha[D: TempleGrounds]</td>
+<td>0.015</td>
+<td>0.009</td>
+<td>1329.0</td>
+<td>1646.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">beta_weather[Sunny]</td>
+<td>0.013</td>
+<td>0.010</td>
+<td>1523.0</td>
+<td>1644.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">beta_weather[rain]</td>
+<td>0.013</td>
+<td>0.010</td>
+<td>1506.0</td>
+<td>1661.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">beta_weather[Cloudy]</td>
+<td>0.013</td>
+<td>0.010</td>
+<td>1541.0</td>
+<td>1707.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">beta_season[Spring]</td>
+<td>0.007</td>
+<td>0.005</td>
+<td>1405.0</td>
+<td>1651.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">beta_season[Summer]</td>
+<td>0.007</td>
+<td>0.005</td>
+<td>1376.0</td>
+<td>1721.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">beta_season[Winter]</td>
+<td>0.007</td>
+<td>0.005</td>
+<td>1422.0</td>
+<td>1605.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">beta_season[Autumn]</td>
+<td>0.007</td>
+<td>0.005</td>
+<td>1405.0</td>
+<td>1659.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mu_global</td>
+<td>0.015</td>
+<td>0.009</td>
+<td>1324.0</td>
+<td>1726.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">sigma_global</td>
+<td>0.002</td>
+<td>0.004</td>
+<td>1289.0</td>
+<td>1717.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">sigma</td>
+<td>0.001</td>
+<td>0.003</td>
+<td>654.0</td>
+<td>802.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ol type="1">
+<li><span class="math inline">\(\hat{R}\)</span> (R-hat): 全変数で 1.00 となっており、サンプリングが完全に定常状態に達していることを示しています。</li>
+<li>ESS (Effective Sample Size) - Bulk / Tail: 通常 400 以上あれば合格ですが、1500前後の有効サンプルが確保されており、不確実性の見積もりが非常に正確です</li>
+<li>MCSE (Monte Carlo Standard Error) - Mean / SD: 画像では数値が非常に小さく（0.0…単位）、ビジネス上の判断（数万〜数億円単位）において完全に無視できる誤差範囲に収まっています。</li>
+</ol>
+<p>上記より、数学的な指標でも問題なく推論できていることが確認できそうです。</p>
+<blockquote class="blockquote">
+<h4 id="各指標の意味" class="anchored">各指標の意味</h4>
+<h5 id="mcse-monte-carlo-standard-error---mean" class="anchored">1. MCSE (Monte Carlo Standard Error) - Mean</h5>
+<ul>
+<li>【定義】: サンプリングの回数が有限であることによって生じる、平均値の推定誤差。</li>
+<li>【解釈】: 「もう一度同じ計算をした時の、結果のブレ幅」 です。この値がビジネスで扱う金額（例：1万円単位）に対して十分に小さければ、「計算回数が足りないせいで判断を誤る」リスクがないと言えます。 ##### 2. MCSE (Monte Carlo Standard Error) - SD</li>
+<li>【定義】: 標準偏差（不確実性の幅）そのものに含まれる推定誤差。</li>
+<li>【解釈】: 「リスクの見積もり自体の不確かさ」 です。ビジネスの「勝率」を計算する際、この値が大きいと「勝率70%と言ったが、実は計算誤差で±10%ズレるかも」という話になります。 ##### ESS (Effective Sample Size) - Bulk</li>
+<li>【定義】: 自己相関（サンプル同士の似通い）を考慮した、実質的な独立サンプル数。分布の「中心付近」の精度を表す。</li>
+<li>【解釈】: 「連写した写真の中の、ブレていない有効枚数」 です。4,000回サンプリングしても、似たような値ばかりだと情報は増えません。この数値が 400（1チェーンあたり100相当）以上あれば、平均値の推定は十分に安定しています。 ##### 3. ESS (Effective Sample Size) - Tail</li>
+<li>【定義】: 分布の端（裾）の部分における有効サンプル数。</li>
+<li>【解釈】: 「レアケースに対する目撃証言の数」 です。ビジネスのリスク（最悪のケース）を見積もるには、平均値だけでなく「端っこ」の分布が安定している必要があり、意思決定において非常に重要です。 ##### <span class="math inline">\(\hat{R}\)</span> (R-hat)</li>
+<li>【定義】: 各チェーンの「内側の分散」と「チェーン間の分散」を比較した指標。1.00に近いほど良く、1.01未満が合格ライン。</li>
+<li>【解釈】: 「4人の調査員の合致度」 です。別々に調査した4人が全く同じ結論（分布）に辿り着いたかを確認します。1.01を超えると「誰か一人が違う意見（計算ミス）」を持っている状態です。</li>
+</ul>
+</blockquote>
+</section>
+<section id="層フィルタリングhdi-rope-roi分析" class="level2">
+<h2 class="anchored" data-anchor-id="層フィルタリングhdi-rope-roi分析">３層フィルタリング(HDI, ROPE, ROI)分析</h2>
+<section id="推論結果とコスト構造の動的ロードシミュレーション" class="level3">
+<h3 class="anchored" data-anchor-id="推論結果とコスト構造の動的ロードシミュレーション">推論結果とコスト構造の動的ロード・シミュレーション</h3>
+<ul>
+<li><code>df_summary = az.summary(inference)</code> よりパラメータ</li>
+<li><code>df_raw</code> からコスト構造</li>
+</ul>
+<p>を動的に取得し、天候不明のリスクと日々のノイズ（<span class="math inline">\(\sigma\)</span>）をすべてのシミュレーショに反映します。</p>
+<div id="a36400761b0c0e2e" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:25:55.303765Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:25:55.072753Z&quot;}" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 推論結果の読み込み ---</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>df_summary <span class="op">=</span> az.summary(inference)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ロケーションごとのコスト構造を抽出</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> df_raw.columns[<span class="dv">3</span>:]:</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> df_raw[col].dtype <span class="op">==</span> <span class="st">"object"</span>:</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>        df_raw[col] <span class="op">=</span> df_raw[col].<span class="bu">str</span>.replace(<span class="st">","</span>, <span class="st">""</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ロケーションごとのコスト構造を抽出</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>info_cost <span class="op">=</span> df_raw.groupby(<span class="st">"Location"</span>).agg({<span class="st">"Fixed_Costs"</span>: <span class="st">"mean"</span>, <span class="st">"Commission_Rate"</span>: <span class="st">"mean"</span>}).to_dict(<span class="st">"index"</span>)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2026年02月の全組み合わせシナリオ生成 ---</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>results_scenario <span class="op">=</span> []</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> inference.posterior.dims[<span class="st">"draw"</span>]</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>target_season <span class="op">=</span> df_summary.index[<span class="dv">9</span>]  <span class="co"># beta_season[Winter]</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>val_sigma <span class="op">=</span> df_summary.loc[<span class="st">"sigma"</span>, <span class="st">"mean"</span>]</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> location <span class="kw">in</span> locations:</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> weather <span class="kw">in</span> weathers:</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># パラメータ抽出</span></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>        alpha_mean, alpha_sd <span class="op">=</span> df_summary.loc[<span class="ss">f"alpha[</span><span class="sc">{</span>location<span class="sc">}</span><span class="ss">]"</span>, <span class="st">"mean"</span>], df_summary.loc[<span class="ss">f"alpha[</span><span class="sc">{</span>location<span class="sc">}</span><span class="ss">]"</span>, <span class="st">"sd"</span>]</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>        weather_mean, weather_sd <span class="op">=</span> df_summary.loc[<span class="ss">f"beta_weather[</span><span class="sc">{</span>weather<span class="sc">}</span><span class="ss">]"</span>, <span class="st">"mean"</span>], df_summary.loc[</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"beta_weather[</span><span class="sc">{</span>weather<span class="sc">}</span><span class="ss">]"</span>, <span class="st">"sd"</span>]</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>        season_mean, season_sd <span class="op">=</span> df_summary.loc[target_season, <span class="st">"mean"</span>], df_summary.loc[target_season, <span class="st">"sd"</span>]</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 推論された sigma の分布から値を引く</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>        sigma_mean, sigma_sd <span class="op">=</span> df_summary.loc[<span class="st">"sigma"</span>, <span class="st">"mean"</span>], df_summary.loc[<span class="st">"sigma"</span>, <span class="st">"sd"</span>]</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>        sigma_samples <span class="op">=</span> rng.normal(sigma_mean, sigma_sd, n_samples)</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sigma は正の値である必要があるため、年の為クリップ</span></span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>        sigma_samples <span class="op">=</span> np.maximum(sigma_samples, <span class="fl">1e-6</span>)</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># シミュレーション (mu の生成: 構造的な実力)</span></span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>        mu_samples <span class="op">=</span> (rng.normal(alpha_mean, alpha_sd, n_samples) <span class="op">+</span></span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>                      rng.normal(weather_mean, weather_sd, n_samples) <span class="op">+</span></span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>                      rng.normal(season_mean, season_sd, n_samples))</span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 個別予測 (mu と sigma の両方の不確実性を統合)</span></span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>        sales_samples <span class="op">=</span> np.exp(rng.normal(mu_samples, sigma_samples))</span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 利益の算出 (地点別コストを動的に取得)</span></span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>        cost_fixed <span class="op">=</span> info_cost[location][<span class="st">"Fixed_Costs"</span>]</span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>        rate_commission <span class="op">=</span> info_cost[location][<span class="st">"Commission_Rate"</span>]</span>
+<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a>        profits <span class="op">=</span> sales_samples <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> rate_commission) <span class="op">-</span> cost_fixed</span>
+<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> profit <span class="kw">in</span> profits:</span>
+<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a>            results_scenario.append({<span class="st">"Location"</span>: location, <span class="st">"Weather"</span>: weather, <span class="st">"Sales_Pred"</span>: profit})</span>
+<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a>df_scenarios <span class="op">=</span> pd.DataFrame(results_scenario)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="sigma-の役割" class="level5">
+<h5 class="anchored" data-anchor-id="sigma-の役割"><strong>sigma の役割:</strong></h5>
+<p>対数正規分布における「形状パラメータ（Shape parameter）」。対数スケールでの標準偏差を表します。 この値が大きいほど、地点や天気が同じでも、日々の売上が激しく上下します。</p>
+<blockquote class="blockquote">
+<h5 id="tips-4" class="anchored">Tips</h5>
+<h6 id="なぜ-sigma_val-固定値-ではなくサンプリングするのか" class="anchored"><strong>なぜ sigma_val (固定値) ではなくサンプリングするのか:</strong></h6>
+<p>推論された sigma にも標準偏差（不確実性）が存在するため「ノイズの音量はおよそ10（mean）」と分かっていても、実は「9〜11（sd）」の範囲で確信が持てないかもしれません。 この「確信のなさ」を無視すると、最悪のケース（大赤字のリスク）を過小評価してしまう可能性があります。</p>
+</blockquote>
+</section>
+<section id="統計的根拠と分布の選択-1" class="level4">
+<h4 class="anchored" data-anchor-id="統計的根拠と分布の選択-1">【統計的根拠と分布の選択】</h4>
+<p><strong>対数正規分布の個別予測</strong>: <code>np.exp(rng.normal(mu, sigma))</code> は、対数正規分布 <span class="math inline">\(LogNormal(\mu, \sigma)\)</span> から直接サンプリングしていることと同義です。 <code>exp(rng.normal(mu, sigma))</code> は「その条件で発生し得るある1日の売上」を算出する式になります。</p>
+<div id="77f3f15e96600093" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:37:19.070824Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:37:17.184758Z&quot;}" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- プロットの作成 (boxplot) ---</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df_scenarios, x<span class="op">=</span><span class="st">"Location"</span>, y<span class="op">=</span><span class="st">"Sales_Pred"</span>, hue<span class="op">=</span><span class="st">"Weather"</span>, fliersize<span class="op">=</span><span class="dv">0</span>, width<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">0</span>, color<span class="op">=</span>COLOR_RED, linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">"Break-even point"</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>plt.ylim(top<span class="op">=</span><span class="dv">300000</span>)</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"February 2026: Profit simulation by location and weather (all-round risk visualization)"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Store location"</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Estimated Net Profit (yen)"</span>)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>plt.grid(axis<span class="op">=</span><span class="st">"y"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">"Forecast Weather"</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">1.05</span>, <span class="dv">1</span>), loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hierarchical_baysian_linear_regression_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="結果の解釈とビジネス上の意味" class="level4">
+<h4 class="anchored" data-anchor-id="結果の解釈とビジネス上の意味">【結果の解釈とビジネス上の意味】</h4>
+<ol type="1">
+<li><strong>意思決定の信頼性</strong>: sigma の不確実性を入れた上でも各ボックスが 0 を超えていれば、それは<strong>「どれだけ運が悪く、どれだけ予測がブレても、ほぼ確実に利益が出る」</strong>という最強の証明になります。</li>
+<li><strong>勝率（Win Rate）の精度</strong>: 利益が 0 を下回る確率を計算する際、sigma の不確実性を入れることで、より保守的（安全側）なリスク見積もりが可能になり、中小規模ビジネスにおける「不意の赤字による資金ショート」を防ぐ手助けとなります。</li>
+</ol>
+</section>
+</section>
+<section id="年02月-出店売上コスト予測表-rope判定付" class="level3">
+<h3 class="anchored" data-anchor-id="年02月-出店売上コスト予測表-rope判定付">2026年02月 出店売上・コスト予測表 (ROPE判定付)</h3>
+<p>推論結果（summary_inference.csv）とコスト構造（sales_performance.csv）から動的に値を抽出し、全ロケーションの損益予測を算出します。</p>
+<p>経営層が投資判断を下すために必要な「期待値」と「リスクの振れ幅（上下限）」を、金額ベースで一覧化します。</p>
+<div id="d051e7b2751e6c6c" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-18T13:46:19.324813Z&quot;,&quot;start_time&quot;:&quot;2026-01-18T13:46:19.266067Z&quot;}" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- シミュレーション結果を集計し、意思決定テーブルを作成 ---</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 利益の期待値と不可実性の範囲 (HDI に相当するパーセンタイル) を算出</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>df_scenarios.columns <span class="op">=</span> [<span class="st">"出店場所"</span>, <span class="st">"天気"</span>, <span class="st">"予想利益"</span>]</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>df_summary_table <span class="op">=</span> df_scenarios.groupby(<span class="st">"出店場所"</span>)[<span class="st">"予想利益"</span>].agg([</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"期待利益平均"</span>, <span class="st">"mean"</span>),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"利益下限(3%)"</span>, <span class="kw">lambda</span> x: np.percentile(x, <span class="dv">3</span>)),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"利益上限(97%)"</span>, <span class="kw">lambda</span> x: np.percentile(x, <span class="dv">97</span>)),</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"黒字確率"</span>, <span class="kw">lambda</span> x: (x <span class="op">&gt;</span> <span class="dv">0</span>).mean())</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>]).copy()</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ROPE判定: 実務上の損益分岐点を 20,000円 と定義</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>rope_threshold <span class="op">=</span> <span class="dv">20_000</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>df_summary_table[<span class="st">"ROPE判定(利益確保)"</span>] <span class="op">=</span> df_summary_table[<span class="st">"期待利益平均"</span>] <span class="op">&gt;</span> rope_threshold</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 結果の表示</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>df_summary_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">期待利益平均</th>
+<th data-quarto-table-cell-role="th">利益下限(3%)</th>
+<th data-quarto-table-cell-role="th">利益上限(97%)</th>
+<th data-quarto-table-cell-role="th">黒字確率</th>
+<th data-quarto-table-cell-role="th">ROPE判定(利益確保)</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">出店場所</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">A: StationSquare</td>
+<td>16394.361692</td>
+<td>-39532.307369</td>
+<td>199965.364421</td>
+<td>0.424667</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">B: ParkStreet</td>
+<td>41752.023798</td>
+<td>-24262.116184</td>
+<td>269624.005475</td>
+<td>0.624667</td>
+<td>True</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C: Shopping mall</td>
+<td>4837.206013</td>
+<td>-50018.424593</td>
+<td>173663.379247</td>
+<td>0.348667</td>
+<td>False</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">D: TempleGrounds</td>
+<td>33043.642141</td>
+<td>-28961.800335</td>
+<td>221855.668784</td>
+<td>0.565000</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<h5 id="rope-実質的等価性" class="anchored">ROPE (実質的等価性)</h5>
+<p>統計的な有意差ではなく、実務上のインパクト（今回は2万円の利益）があるかどうかの境界線になります。 「1円でも黒字ならOK」ではなく、「準備の手間を考えて、最低これくらいは残ってほしい」という<strong>合格ライン</strong>です。</p>
+</blockquote>
+<blockquote class="blockquote">
+<h5 id="マージナライズ-平均化" class="anchored">マージナライズ (平均化)</h5>
+<p>特定の変数（天気）のすべての可能性を考慮して、全体としての期待値を算出することです。 「晴れの点数」と「雨の点数」を混ぜこぜにして、<strong>「結局、平均して何点取れそうか」</strong> を計算します。</p>
+</blockquote>
+<p>このテーブルにより、どのロケーションが「天候リスクに対して頑健（タフ）か」が明らかになります。期待利益が高く、かつ「利益下限(3%)」が 0 を大きく上回っている地点は、ビジネス上のリスクが極めて低い「優良案件」と判断できます。</p>
+</section>
+<section id="年02月-最適出店ロケーションの戦略提案" class="level3">
+<h3 class="anchored" data-anchor-id="年02月-最適出店ロケーションの戦略提案">2026年02月 最適出店ロケーションの戦略提案</h3>
+<p>最終的な ROI(投資対効果）とダウンサイドリスク (赤字の危険性)を評価し、具体的なアクションを提案します。</p>
+<p>単なる「平均」ではなく、「勝つときはいくら勝ち、負けるときはいくら負けるか」というリスクの非対称性を可視化し、意思決定の判断を助けれるようにしようと思います。</p>
+<div id="be403fa689e854" class="cell" data-executetime="{&quot;end_time&quot;:&quot;2026-01-03T16:11:51.828756Z&quot;,&quot;start_time&quot;:&quot;2026-01-03T16:11:51.811925Z&quot;}" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ROI (経済的評価)に基づいた最終推奨地点の特定 ---</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ROPE をクリアし、かつ期待利益が最大のロケーションを抽出</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>location_best <span class="op">=</span> df_summary_table[df_summary_table[<span class="st">"ROPE判定(利益確保)"</span>] <span class="op">==</span> <span class="va">True</span>][<span class="st">"期待利益平均"</span>].idxmax()</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 推奨地点の利益分布を抽出してリスク構造を分解</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>dist_best_profit <span class="op">=</span> df_scenarios[df_scenarios[<span class="st">"出店場所"</span>] <span class="op">==</span> location_best][<span class="st">"予想利益"</span>]</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>profit_plus <span class="op">=</span> dist_best_profit[dist_best_profit <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>profit_minus <span class="op">=</span> dist_best_profit[dist_best_profit <span class="op">&lt;=</span> <span class="dv">0</span>]</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"【最終戦略提案】2026年02月は『</span><span class="sc">{</span>location_best<span class="sc">}</span><span class="ss">』への出店を強く推奨します。"</span>)</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"■ 黒字時の期待利益: +</span><span class="sc">{</span>profit_plus<span class="sc">.</span>mean()<span class="sc">:,.0f}</span><span class="ss"> 円"</span>)</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  - 発生確率(勝率): </span><span class="sc">{</span><span class="bu">len</span>(profit_plus) <span class="op">/</span> <span class="bu">len</span>(dist_best_profit)<span class="sc">:,.1%}</span><span class="ss">"</span>)</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"■ 赤字時の平均損失: </span><span class="sc">{</span>profit_minus<span class="sc">.</span>mean() <span class="cf">if</span> <span class="bu">len</span>(profit_minus) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span><span class="sc">:,.0f}</span><span class="ss"> 円"</span>)</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  - 発生確率: </span><span class="sc">{</span><span class="bu">len</span>(profit_minus) <span class="op">/</span> <span class="bu">len</span>(dist_best_profit)<span class="sc">:,.1%}</span><span class="ss">"</span>)</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"※ この予測は、天候不詳リスクおよび日々の売上変動 (sigma) をすべて考慮した結果です。"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>【最終戦略提案】2026年02月は『B: ParkStreet』への出店を強く推奨します。
+============================================================
+■ 黒字時の期待利益: +75,009 円
+  - 発生確率(勝率): 62.5%
+■ 赤字時の平均損失: -13,597 円
+  - 発生確率: 37.5%
+------------------------------------------------------------
+※ この予測は、天候不詳リスクおよび日々の売上変動 (sigma) をすべて考慮した結果です。</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/petalab-io\.github\.io\/bayesian-iroha\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
