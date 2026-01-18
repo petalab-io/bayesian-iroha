@@ -1,0 +1,13 @@
+Opening_DateTime,Location,Weather,Sales(sales_obs),Fixed_Costs,Commission_Rate
+2025-04-12 08:00-17:00,A: StationSquare,Sunny,"73,900","45,000",0.1
+2025-06-20 08:00-17:00,A: StationSquare,rain,"17,100","45,000",0.1
+2025-12-15 08:00-17:00,A: StationSquare,Cloudy,"38,500","45,000",0.1
+2025-05-10 08:00-17:00,B: ParkStreet,rain,"17,300","30,000",0.05
+2025-08-05 08:00-17:00,B: ParkStreet,Sunny,"84,000","30,000",0.05
+2025-10-25 08:00-17:00,B: ParkStreet,Cloudy,"40,500","30,000",0.05
+2025-07-15 08:00-17:00,C: Shopping mall,Sunny,"90,500","55,000",0.15
+2025-11-02 08:00-17:00,C: Shopping mall,rain,"14,400","55,000",0.15
+2025-01-20 08:00-17:00,C: Shopping mall,Cloudy,"39,100","55,000",0.15
+2025-03-25 08:00-17:00,D: TempleGrounds,Cloudy,"51,700","35,000",0.05
+2025-09-12 08:00-17:00,D: TempleGrounds,Sunny,"72,300","35,000",0.05
+2025-02-10 08:00-17:00,D: TempleGrounds,rain,"13,600","35,000",0.05
