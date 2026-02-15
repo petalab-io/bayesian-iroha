@@ -1,8 +1,8 @@
 # Bayesian Iroha: プロフェッショナル分析規約
 
 ## 1. 命名規則とスタイル
-- **変数命名**: `[主語・目的]_[修飾語]`（スネークケース）を厳守。
-  - 例: `lcp_obs`, `diff_ms`, `profit_distribution`
+- **変数命名**: `[役割・型]_[対象]` （役割によるグルーピングを優先）
+  - 例: `obs_lcp`, `delta_ms`, `distribution_profit`
 - **関数命名**: 動詞から開始。
   - 例: `generate_data()`, `run_simulation()`
 - **型ヒントとDocstring**: 全ての関数に付与。Googleスタイルを標準とする。
