@@ -14,14 +14,14 @@
 
 ## 📂 ディレクトリ構成
 
-Quarto を用いてドキュメントサイトとしてビルド可能な構成にしています。パッケージ管理には **Poetry** を使用します。
+Quarto を用いてドキュメントサイトとしてビルド可能な構成にしています。パッケージ管理には **uv** を使用します。
 
 ```text
 bayesian-iroha/
 ├── _quarto.yml             # サイト構成設定
 ├── index.qmd               # サイトのトップページ
-├── pyproject.toml          # ★Poetry設定ファイル
-├── poetry.lock             # ★依存関係ロックファイル
+├── pyproject.toml          # ★uv設定ファイル
+├── uv.lock                 # ★依存関係ロックファイル
 │
 ├── src/                    # 共通分析ライブラリ
 │   ├── models.py           # PyMCモデル定義（非中心化実装など）
@@ -37,21 +37,15 @@ bayesian-iroha/
 
 ## 🛠 環境構築
 
-WSL (Ubuntu) 上の Pyenv + Poetry 環境で構築します。
+WSL (Ubuntu) 上の uv 環境で構築します。
 
 ### 1. Python環境の準備 (Terminal)
 
 プロジェクトルートで以下のコマンドを実行し、環境をセットアップしてください。
 
 ```bash
-# 1. PyenvでPythonバージョンを指定
-pyenv local 3.12.8
-
-# 2. Poetry環境をPyenvのPythonに紐づけ
-poetry env use $(pyenv which python)
-
-# 3. 依存ライブラリのインストール
-poetry install
+# 1. 依存ライブラリのインストール（.python-version に基づき uv が Python 本体も自動取得）
+uv sync
 ```
 
 ### 2. Quarto (ドキュメント生成ツール)
@@ -88,7 +82,7 @@ rm quarto-1.6.40-linux-amd64.deb
 rm -rf .quarto _site
 
 # 2. ローカルでのレンダリング確認
-poetry run quarto render
+uv run quarto render
 
 # 3. ソースコードの保存
 git add .
@@ -96,7 +90,7 @@ git commit -m "feat: new notebook added"
 git push origin main
 
 # 4. サイトの公開（GitHub Pagesなど）
-poetry run quarto publish gh-pages
+uv run quarto publish gh-pages
 ```
 
 ## 📚 共通ライブラリ (`src/`) について

@@ -22,7 +22,7 @@ format:
     theme: lux
     toc: true
 
-# 重要：Poetryの仮想環境を反映させるためのJupyter設定
+# 重要：uvの仮想環境(.venv)を反映させるためのJupyter設定
 jupyter: python3
 
 execute:
