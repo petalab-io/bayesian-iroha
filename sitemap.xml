@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/01_web_performance/roi_decision.html</loc>
-    <lastmod>2026-01-18T18:29:39.097Z</lastmod>
-  </url>
-  <url>
-    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/03_Sales_forecast_by_market_location/hierarchical_baysian_linear_regression.html</loc>
-    <lastmod>2026-01-18T18:29:39.109Z</lastmod>
-  </url>
-  <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/index.html</loc>
-    <lastmod>2026-01-18T18:57:20.621Z</lastmod>
+    <lastmod>2026-07-11T05:55:45.606Z</lastmod>
   </url>
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/03_Sales_forecast_by_market_location/weakly_information_prior.html</loc>
-    <lastmod>2026-01-18T18:29:39.117Z</lastmod>
+    <lastmod>2026-07-11T05:55:45.627Z</lastmod>
+  </url>
+  <url>
+    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/04_survey_latent_segmentasion/mixture_model_inference.html</loc>
+    <lastmod>2026-07-11T05:55:45.636Z</lastmod>
   </url>
   <url>
     <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/02_hockey_gotender/hockey_spatial_analysis.html</loc>
-    <lastmod>2025-12-29T04:18:23.688Z</lastmod>
+    <lastmod>2026-07-11T05:55:45.620Z</lastmod>
+  </url>
+  <url>
+    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/01_web_performance/roi_decision.html</loc>
+    <lastmod>2026-07-11T05:55:45.616Z</lastmod>
+  </url>
+  <url>
+    <loc>https://petalab-io.github.io/bayesian-iroha/notebooks/03_Sales_forecast_by_market_location/hierarchical_baysian_linear_regression.html</loc>
+    <lastmod>2026-07-11T05:55:45.626Z</lastmod>
   </url>
 </urlset>

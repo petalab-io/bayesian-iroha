@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>平均に隠れた本音を暴く。混合モデルによる顧客満足度構造の深堀り – ベイジアンいろは</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-4486e3917beacbb720a432be5e6fb15b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      ベイジアンいろは
+      </li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">ベイジアンいろは</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Web Performance ROI Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/01_web_performance/roi_decision.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">エグゼクティブサマリー</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">spatial model Analysis</span></span>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#ユースケース" id="toc-ユースケース" class="nav-link active" data-scroll-target="#ユースケース">ユースケース</a></li>
+  <li><a href="#ビジネス課題の定義" id="toc-ビジネス課題の定義" class="nav-link" data-scroll-target="#ビジネス課題の定義">ビジネス課題の定義</a>
+  <ul class="collapse">
+  <li><a href="#背景" id="toc-背景" class="nav-link" data-scroll-target="#背景">背景</a></li>
+  <li><a href="#現場の信念" id="toc-現場の信念" class="nav-link" data-scroll-target="#現場の信念">現場の信念</a></li>
+  </ul></li>
+  <li><a href="#データ確認eda-exploratory-data-analysis" id="toc-データ確認eda-exploratory-data-analysis" class="nav-link" data-scroll-target="#データ確認eda-exploratory-data-analysis">データ確認（EDA: Exploratory Data Analysis）</a></li>
+  <li><a href="#戦略的問い立てos-の選択" id="toc-戦略的問い立てos-の選択" class="nav-link" data-scroll-target="#戦略的問い立てos-の選択">戦略的問い立て（OS の選択）</a>
+  <ul class="collapse">
+  <li><a href="#os-エンジン" id="toc-os-エンジン" class="nav-link" data-scroll-target="#os-エンジン">OS (エンジン)</a></li>
+  </ul></li>
+  <li><a href="#ベジパタ-os-選定" id="toc-ベジパタ-os-選定" class="nav-link" data-scroll-target="#ベジパタ-os-選定">ベジパタ OS 選定</a></li>
+  <li><a href="#分析用データ加工" id="toc-分析用データ加工" class="nav-link" data-scroll-target="#分析用データ加工">分析用データ加工</a></li>
+  <li><a href="#確率モデルの構築" id="toc-確率モデルの構築" class="nav-link" data-scroll-target="#確率モデルの構築">確率モデルの構築</a></li>
+  <li><a href="#事前予測チェック-prior-predictive-check" id="toc-事前予測チェック-prior-predictive-check" class="nav-link" data-scroll-target="#事前予測チェック-prior-predictive-check">事前予測チェック (Prior Predictive Check)</a></li>
+  <li><a href="#モデルデバック" id="toc-モデルデバック" class="nav-link" data-scroll-target="#モデルデバック">モデル・デバック</a></li>
+  <li><a href="#推論mcmcサンプリング" id="toc-推論mcmcサンプリング" class="nav-link" data-scroll-target="#推論mcmcサンプリング">推論（MCMCサンプリング）</a></li>
+  <li><a href="#推論結果の診断" id="toc-推論結果の診断" class="nav-link" data-scroll-target="#推論結果の診断">推論結果の診断</a></li>
+  <li><a href="#事後予測チェック" id="toc-事後予測チェック" class="nav-link" data-scroll-target="#事後予測チェック">事後予測チェック</a>
+  <ul class="collapse">
+  <li><a href="#各線の意味" id="toc-各線の意味" class="nav-link" data-scroll-target="#各線の意味">各線の意味</a></li>
+  <li><a href="#解釈" id="toc-解釈" class="nav-link" data-scroll-target="#解釈">解釈</a></li>
+  </ul></li>
+  <li><a href="#意思決定プロセスの実行" id="toc-意思決定プロセスの実行" class="nav-link" data-scroll-target="#意思決定プロセスの実行">意思決定プロセスの実行</a>
+  <ul class="collapse">
+  <li><a href="#つの山事後分布" id="toc-つの山事後分布" class="nav-link" data-scroll-target="#つの山事後分布">1. 2つの山（事後分布）</a></li>
+  <li><a href="#重み比率" id="toc-重み比率" class="nav-link" data-scroll-target="#重み比率">2. 重み（：比率）</a></li>
+  <li><a href="#プロットアンケート結果緑の点" id="toc-プロットアンケート結果緑の点" class="nav-link" data-scroll-target="#プロットアンケート結果緑の点">3. プロット（アンケート結果：緑の点）</a></li>
+  </ul></li>
+  <li><a href="#ビジネスインパクト" id="toc-ビジネスインパクト" class="nav-link" data-scroll-target="#ビジネスインパクト">ビジネスインパクト</a></li>
+  <li><a href="#推奨アクションの提案案" id="toc-推奨アクションの提案案" class="nav-link" data-scroll-target="#推奨アクションの提案案">推奨アクションの提案案</a>
+  <ul class="collapse">
+  <li><a href="#守り-ネガティブ層約30の止血と原因究明" id="toc-守り-ネガティブ層約30の止血と原因究明" class="nav-link" data-scroll-target="#守り-ネガティブ層約30の止血と原因究明">1. 【守り】 ネガティブ層（約30%）の「止血」と原因究明</a></li>
+  <li><a href="#攻め-ポジティブ層約70の価値最大化" id="toc-攻め-ポジティブ層約70の価値最大化" class="nav-link" data-scroll-target="#攻め-ポジティブ層約70の価値最大化">2. 【攻め】 ポジティブ層（約70%）の「価値最大化」</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">平均に隠れた本音を暴く。混合モデルによる顧客満足度構造の深堀り</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>「満足度 3.1 点」という平均値の裏側には、「熱狂的なファン」と「静かな不満層」が混在している可能性があります。 この「声なき多層構造」をベイズで可視化し、商品・サービス改善の真の優先順位を特定します。</p>
+<section id="ユースケース" class="level2">
+<h2 class="anchored" data-anchor-id="ユースケース">ユースケース</h2>
+<p>新商品発売やサービスのリニューアル後、アンケート結果が「中途半端な平均値」に落ち着いてしまい、次の一手に迷っています。</p>
+<div id="9782d90fbbdaeaf6" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:35.558174800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:34.368188200Z&quot;}}" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytensor.tensor <span class="im">as</span> pt</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="67b53f007a52eee1" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:35.631022600Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:35.563160900Z&quot;}}" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Color Identity</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>COLOR_PURPLE <span class="op">=</span> <span class="st">"#985DE5"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>COLOR_BLUE   <span class="op">=</span> <span class="st">"#118AB2"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>COLOR_GREEN  <span class="op">=</span> <span class="st">"#06D6A0"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>COLOR_YELLOW <span class="op">=</span> <span class="st">"#F9C74F"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>COLOR_RED    <span class="op">=</span> <span class="st">"#EF476F"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>COLOR_GRAY   <span class="op">=</span> <span class="st">"#8D99AE"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plt.rcdefaults()  <span class="co"># plt の現在のカラー定義をリセット</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>palette_brand <span class="op">=</span> [COLOR_PURPLE, COLOR_BLUE, COLOR_GREEN, COLOR_YELLOW, COLOR_RED, COLOR_GRAY]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>, palette<span class="op">=</span>palette_brand)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"axes.prop_cycle"</span>] <span class="op">=</span> plt.cycler(color<span class="op">=</span>palette_brand)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="a8f0285ab4b12982" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:35.784104200Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:35.640020300Z&quot;}}" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 可視化時に日本語を表示可能にする</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> japanize_matplotlib</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"font.family"</span>] <span class="op">=</span> <span class="st">"IPAexGothic"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="57442f129bbcbee7" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:35.862300800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:35.803279100Z&quot;}}" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data の生成: 満足層(75%)と隠れ不満層(25%)の混合</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>n_obs <span class="op">=</span> <span class="dv">40</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>results_survey <span class="op">=</span> np.concatenate([</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    np.random.normal(<span class="fl">3.8</span>, <span class="fl">0.7</span>, <span class="bu">int</span>(n_obs <span class="op">*</span> <span class="fl">0.75</span>)),  <span class="co"># 満足層（ボリューム大、バラツキ大）</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    np.random.normal(<span class="fl">1.5</span>, <span class="fl">0.4</span>, <span class="bu">int</span>(n_obs <span class="op">*</span> <span class="fl">0.25</span>)),  <span class="co"># 隠れ不満層（ボリューム小、極端に低い）</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># シャッフルして５段階評価にクリップ</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>np.random.shuffle(results_survey)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>results_survey <span class="op">=</span> np.clip(results_survey, <span class="fl">1.0</span>, <span class="fl">5.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="465187933ae38db8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:35.964372300Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:35.869278400Z&quot;}}" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>results_survey.mean()  <span class="co"># 観測データの平均を出力</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>np.float64(3.1030907747941225)</code></pre>
+</div>
+</div>
+<p>アンケート結果が、最も「中途半端な平均値」に落ち着いてしまっています。</p>
+</section>
+<section id="ビジネス課題の定義" class="level2">
+<h2 class="anchored" data-anchor-id="ビジネス課題の定義">ビジネス課題の定義</h2>
+<section id="背景" class="level3">
+<h3 class="anchored" data-anchor-id="背景">背景</h3>
+<p>新商品リリース後のアンケート結果は、平均3.1点。従来のアプローチであれば「全体的に満足度は普通」と結論づけ、平均点を底上げする無難な施策が打たれがちです。</p>
+</section>
+<section id="現場の信念" class="level3">
+<h3 class="anchored" data-anchor-id="現場の信念">現場の信念</h3>
+<p>しかし、カスタマーサクセス（CS）部門へのヒアリングから、<strong>「アンケートの平均点には表れにくいが、サービスに対して明確かつ強い不満を抱えている『サイレントな失望層』が一定数、存在する気がする…」</strong> という懸念（ドメイン知識）が提示されました。</p>
+</section>
+</section>
+<section id="データ確認eda-exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="データ確認eda-exploratory-data-analysis">データ確認（EDA: Exploratory Data Analysis）</h2>
+<p>現場の懸念を念頭に置き、実際のデータ（）の分布を確認します。</p>
+<div id="bb10547220de3083" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:36.525978400Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:35.974813500Z&quot;}}" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ヒストグラムで分布を確認</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">5</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sns.histplot(results_survey, bins<span class="op">=</span><span class="dv">10</span>, kde<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"EDA - アンケート結果 (n=</span><span class="sc">{</span>n_obs<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>ヒストグラムを見ると、3〜4点に大きな山があり、1〜2点付近に少数のデータが存在しています。 単なるデータのバラツキ（外れ値）として処理されがちな微小なシグナルであるが、CSの「懸念」と照らし合わせると、これが「隠れた不満層」の尻尾である可能性が高そうです。</p>
+</section>
+<section id="戦略的問い立てos-の選択" class="level2">
+<h2 class="anchored" data-anchor-id="戦略的問い立てos-の選択">戦略的問い立て（OS の選択）</h2>
+<p>現場の懸念と、EDAで見えた微小なシグナルを統合し意思決定に繋げるための「問い」を立てます。 ここでは「単一の平均値」を求めるのではなく、顧客が「ポジティブ層」と「ネガティブ層」の2つの異なる集団から構成されているという仮説を立て、<strong>「多様性の分離」</strong> を行うことにしました。</p>
+<p><strong>OS (エンジン)</strong> : 個別データのバラツキを許容しつつ、全体の構造を捉える 階層ベイズの考え方を応用した混合モデル を採用します。</p>
+<section id="os-エンジン" class="level3">
+<h3 class="anchored" data-anchor-id="os-エンジン">OS (エンジン)</h3>
+<p>階層ベイズの考え方を応用した混合モデル</p>
+<section id="選定根拠" class="level4">
+<h4 class="anchored" data-anchor-id="選定根拠">選定根拠</h4>
+<ol type="1">
+<li>個性と共通性の共存 (階層性の応用) 階層ベイズは「個別のデータの違い」を認めつつ、「全体としての共通性」も加味する手法です。混合モデルはこの考え方を応用し、「顧客一人ひとりは違うが、大きく分ければ数種類のタイプ（セグメント）に集約される」という仮説を構造化します。 これにより、「個別のバラツキ」に惑わされず、「集団としての傾向」を安定して抽出が可能です。</li>
+<li>小規模データにおける「確信」の担保 今回の <span class="math inline">\(n=30\)</span> というデータ量は、一般的な統計手法では「有意差なし」や「過学習」のリスクが高い領域です。
+<ul>
+<li><strong>事前知識の活用</strong>: 「顧客には不満層がいるはずだ」というドメイン知見を事前分布として組み込むことで、少ないデータからでも効率的に構造を表現できます。</li>
+<li><strong>不確実性の可視化</strong> : 抽出されたセグメント比率 <span class="math inline">\(w\)</span> や平均値 <span class="math inline">\(\mu\)</span> を「点」ではなく「分布(幅)」として算出するため、経営者は「最悪のシナリオ」を想定した意思決定が可能になります。</li>
+</ul></li>
+<li>意思決定プロセス「期待効用」への直結 混合モデルを選ぶ最大のビジネス的メリットは、「どのグループをターゲットにすべきか」が確率的に計算可能になる点です。
+<ul>
+<li>単一の平均値モデルでは「全員に対して一律の施策」しか提案できません。</li>
+<li>混合モデル (OS)であれば、「40%の失望層を救う施策」と「60%の熱狂層を維持する施策」のそれぞれの投資対効果（期待効用） を天秤にかけることができます。</li>
+</ul></li>
+</ol>
+</section>
+</section>
+</section>
+<section id="ベジパタ-os-選定" class="level2">
+<h2 class="anchored" data-anchor-id="ベジパタ-os-選定">ベジパタ OS 選定</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>カテゴリ</th>
+<th>問い立て(戦略的意図)</th>
+<th>OS(エンジン)</th>
+<th>デザインパターン</th>
+<th>意思決定プロセス</th>
+<th>推奨プロット</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>深堀</td>
+<td>平均に隠れた特殊な集団はないか？</td>
+<td>混合モデル</td>
+<td>⑬サイレント・マジョリティ</td>
+<td>期待効果(セグメント)</td>
+<td>クラスター密度図</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="分析用データ加工" class="level2">
+<h2 class="anchored" data-anchor-id="分析用データ加工">分析用データ加工</h2>
+<p>PyMCでの計算とビジネス上の解釈を繋ぐため、データに次元と座標（ラベル）を定義します。</p>
+<div id="86c0461adbfed90b" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:37.037170500Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:36.893266400Z&quot;}}" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PyMC用の座標 (coords) と次元 (dims) の設定</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id_obs"</span>: np.arange(n_obs),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cluster"</span>: [</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Disappointed"</span>,  <span class="co"># 失望層</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Enthusiast"</span>  <span class="co"># 熱狂層</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="確率モデルの構築" class="level2">
+<h2 class="anchored" data-anchor-id="確率モデルの構築">確率モデルの構築</h2>
+<p>データの背後にある「生成プロセス」を数理モデルとして定義します。<br> 複数の正規分布を比率で混ぜ合わせた確率分布です。</p>
+<div id="c61e04f0cd3191a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:37.325633800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:37.042175600Z&quot;}}" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model_mixture:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 構成比率 (w) の事前分布</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ２つのセグメント(失望層・熱狂層）の比率を推定</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a=[1, 1] は「どの比率も等しくあり得る（無情報）」という設定</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    w_cluster <span class="op">=</span> pm.Dirichlet(<span class="st">"w_cluster"</span>, a<span class="op">=</span>np.array([<span class="dv">1</span>, <span class="dv">1</span>]), dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 平均 (mu) の事前分布: ラベルスイッチングを防ぐため初期値を分ける</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    mu_cluster <span class="op">=</span> pm.Normal(<span class="st">"mu_cluster"</span>, mu<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">4</span>], sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    sigma_cluster <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma_cluster"</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.NormalMixture(<span class="st">"obs"</span>, w<span class="op">=</span>w_cluster, mu<span class="op">=</span>mu_cluster,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                                   sigma<span class="op">=</span>sigma_cluster, observed<span class="op">=</span>results_survey,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                                   dims<span class="op">=</span><span class="st">"id_obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="89e07d37821d7320" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:39.886804900Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:37.328623500Z&quot;}}" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 構築したモデルの可視化</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model_mixture)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-10-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="事前予測チェック-prior-predictive-check" class="level2">
+<h2 class="anchored" data-anchor-id="事前予測チェック-prior-predictive-check">事前予測チェック (Prior Predictive Check)</h2>
+<p>現実的な範囲のデータを生成するか確認します。<br> 自分たちの作った数式モデルで、まともなデータが生成されるかテストします。</p>
+<div id="19f38177807c633f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:40.470572200Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:40.087183900Z&quot;}}" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 事前予測サンプリング</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    idata_prior <span class="op">=</span> pm.sample_prior_predictive(samples<span class="op">=</span><span class="dv">100</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [mu_cluster, obs, sigma_cluster, w_cluster]</code></pre>
+</div>
+</div>
+<div id="2b4e32ace7f58687" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:41.126006Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:40.529454400Z&quot;}}" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 物理&amp;論理的な「範囲」の確認</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>samples_prior <span class="op">=</span> idata_prior.prior_predictive[<span class="st">"obs"</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>az.plot_dist(samples_prior, color<span class="op">=</span>COLOR_YELLOW)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">1.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 下限"</span>, color<span class="op">=</span>COLOR_GREEN)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">5.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 上限"</span>, color<span class="op">=</span>COLOR_RED)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"予測分布の確認 (Range &amp; Shape)"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>分布が -4 から 10 付近まで広がっています。 1. 満足度調査では「-2点」や「8点」という回答は、現実には存在しません。 2. モデルが「-4点もあり得る」と想定した状態でサンプリングを開始すると、実際のデータを説明するのに時間がかかったり、収束が不安定になる原因になります。</p>
+<p>モデルのチューニングを行います。</p>
+<div id="fa3cc7d32d4a0c4f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:41.783982500Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:41.234594500Z&quot;}}" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># チューニング: sigma を絞る</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model_mixture_v1:</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 構成比率 (w) の事前分布</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ２つのセグメント(失望層・熱狂層）の比率を推定</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a=[1, 1] は「どの比率も等しくあり得る（無情報）」という設定</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    w_cluster <span class="op">=</span> pm.Dirichlet(<span class="st">"w_cluster"</span>, a<span class="op">=</span>np.array([<span class="dv">1</span>, <span class="dv">1</span>]), dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 平均 (mu) の事前分布: ラベルスイッチングを防ぐため初期値を分ける</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    mu_cluster <span class="op">=</span> pm.Normal(<span class="st">"mu_cluster"</span>, mu<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">4</span>], sigma<span class="op">=</span><span class="fl">0.5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    sigma_cluster <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma_cluster"</span>, sigma<span class="op">=</span><span class="fl">0.5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.NormalMixture(<span class="st">"obs"</span>, w<span class="op">=</span>w_cluster, mu<span class="op">=</span>mu_cluster,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                                   sigma<span class="op">=</span>sigma_cluster, observed<span class="op">=</span>results_survey,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                                   dims<span class="op">=</span><span class="st">"id_obs"</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    idata_prior_v1 <span class="op">=</span> pm.sample_prior_predictive(samples<span class="op">=</span><span class="dv">100</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [mu_cluster, obs, sigma_cluster, w_cluster]</code></pre>
+</div>
+</div>
+<div id="270ec72e3fda2abb" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:42.021319300Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:41.850474100Z&quot;}}" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 構築したモデルの可視化</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model_mixture_v1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-14-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b5f061bb32939bea" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:42.445822100Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:42.070345800Z&quot;}}" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>samples_prior_v1 <span class="op">=</span> idata_prior_v1.prior_predictive[<span class="st">"obs"</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>az.plot_dist(samples_prior_v1, color<span class="op">=</span>COLOR_BLUE)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">1.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 下限"</span>, color<span class="op">=</span>COLOR_RED)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">5.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 上限"</span>, color<span class="op">=</span>COLOR_GRAY)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"予測分布の確認(Range &amp; Shape)"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>sigma=0.5</code> によって分布の大部分が 1.0 ~ 5.0 の枠内に収まってきていますが物理・理論的に発生しない範囲外の回答が発生する可能性があります。</p>
+<p>これ以上 sigma を絞ると、「各グループ内にはある程度の多様性（バラツキ）がある」という仮説まで否定することになり、モデルが窮屈になりすぎてしまいます。 正規分布を使っている以上、数学的に「裾（テール）」が無限に続くのは避けられません。</p>
+<p>そこで、「無理に山を細くする」のではなく現在の 正規分布 (Normal) を、範囲外を物理的に許さない 截断正規分布 (Truncated Normal) に差し替えます。 &gt;截断正規分布 (Truncated Normal Distribution) &gt; &gt;通常の正規分布 <span class="math inline">\(N(\mu, \sigma^2)\)</span> の確率密度関数に対し、指定した範囲 <span class="math inline">\([a, b]\)</span> 外の確率を 0 とし、範囲内の面積が 1 になるよう再正規化した分布。 &gt; &gt; <span class="math inline">\(f(x|\mu, \sigma, a, b) = \frac{\phi(\frac{x-\mu}{\sigma})}{\sigma(\Phi(\frac{b-\mu}{\sigma}) - \Phi(\frac{a-\mu}{\sigma}))} \quad (a \le x \le b)\)</span></p>
+<div id="e62d6aebb5c35440" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:42.719875100Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:42.520046900Z&quot;}}" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># チューニング: 截断正規分布の採用</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model_mixture_v2:</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 比率の事前分布</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    w_cluster <span class="op">=</span> pm.Dirichlet(<span class="st">"w_cluster"</span>, a<span class="op">=</span>np.array([<span class="dv">1</span>, <span class="dv">1</span>]), dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 平均と標準偏差</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># mu を [1, 5] に截断して安全に</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    mu_cluster <span class="op">=</span> pm.TruncatedNormal(<span class="st">"mu_cluster"</span>, mu<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">4</span>], sigma<span class="op">=</span><span class="fl">0.5</span>, lower<span class="op">=</span><span class="dv">1</span>, upper<span class="op">=</span><span class="dv">5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sigma が 1.0 を超えるとグループ内のばらつきが極端になりすぎる</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    sigma_cluster <span class="op">=</span> pm.TruncatedNormal(<span class="st">"sigma_cluster"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.5</span>, lower<span class="op">=</span><span class="fl">0.05</span>, upper<span class="op">=</span><span class="fl">1.5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># mu[0] &lt; mu[1] を強制 -&gt; ラベルスイッチングを構造的に防止</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    pm.Potential(<span class="st">"order_constraint"</span>, pm.math.switch(mu_cluster[<span class="dv">0</span>] <span class="op">&lt;</span> mu_cluster[<span class="dv">1</span>], <span class="dv">0</span>, <span class="op">-</span>np.inf))</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 截断正規分布をコンポーネントとして定義</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    dist_component <span class="op">=</span> pm.TruncatedNormal.dist(mu<span class="op">=</span>mu_cluster, sigma<span class="op">=</span>sigma_cluster, lower<span class="op">=</span><span class="dv">1</span>, upper<span class="op">=</span><span class="dv">5</span>, shape<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 混合モデルの定義</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.Mixture(<span class="st">"obs"</span>, w<span class="op">=</span>w_cluster, comp_dists<span class="op">=</span>dist_component, observed<span class="op">=</span>results_survey,</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                             dims<span class="op">=</span><span class="st">"id_obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li><p><code>mu</code> 自体も裁断 mu_cluster ~ Normal(mu=[2, 4], sigma=0.5) は無截断なので、理論上 mu が 0 や 6 を取る確率がゼロではありません。 截断正規分布の mu パラメータが定義域外に出ると、コンポーネントの確率密度が極端に歪み、サンプラーの効率が下がるリスクがあります。</p></li>
+<li><p><code>sigma</code> のスケール感を明示する HalfNormal(sigma=0.5) は 95% が約 0〜1.0 に収まりますが、sigma &gt; 1.5 といった値も稀に生成されます。 1〜5 の 4 点幅のスケールでは sigma=1.5 は「ほぼ一様分布」に近く、グループの意味が薄れます。</p></li>
+<li><p>ラベルスイッチングを構造的に防止する 事前平均 [2, 4] で「大体は分かれる」のですが、MCMC チェインが長い場合にスイッチする可能性はゼロではありません。 明示的な順序制約を入れると安心です。</p></li>
+</ul>
+<div id="bee5882830445c2b" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:42.949450400Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:42.757874400Z&quot;}}" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 構築したモデルの可視化</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model_mixture_v2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-17-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="3b6b9bb8bf9e4ccf" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:43.525821300Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:42.952451800Z&quot;}}" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 事前予測サンプリング</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture_v2:</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    idata_prior_v2 <span class="op">=</span> pm.sample_prior_predictive(samples<span class="op">=</span><span class="dv">100</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [mu_cluster, obs, sigma_cluster, w_cluster]</code></pre>
+</div>
+</div>
+<div id="c66c6988e9b22d84" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:43.873025700Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:43.582197600Z&quot;}}" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>samples_prior_v2 <span class="op">=</span> idata_prior_v2.prior_predictive[<span class="st">"obs"</span>]</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>az.plot_dist(samples_prior_v2, color<span class="op">=</span>COLOR_PURPLE)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">1.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 下限"</span>, color<span class="op">=</span>COLOR_YELLOW)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">5.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 上限"</span>, color<span class="op">=</span>COLOR_GREEN)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"事前予測分布の確認 --v2"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-19-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>以下の３点が達成されました。 1. 境界の厳格性: 1.0 未満、5.0 超のサンプルが物理的に存在せず、ビジネス上の矛盾が解消されています。 2. 二峰性の維持: 2.0 付近と 4.0 付近に明確なピークがあり、「サイレント・マジョリティ」を分離する準備が整っています。 3. 確信の「幅」: 山の裾野が広すぎず、かつ平坦すぎないため、実際のデータ（<span class="math inline">\(n=40\)</span>）が持つ情報を吸収するのに最適な「柔軟な予習」になっています。</p>
+</section>
+<section id="モデルデバック" class="level2">
+<h2 class="anchored" data-anchor-id="モデルデバック">モデル・デバック</h2>
+<p>MCMCサンプリングを開始する前に、モデルの初期状態に数学的矛盾（対数尤度が -inf になる等）がないかを点検する。</p>
+<p><code>.point_logps()</code> でモデル内の各ノード（確率変数）において、対数尤度 <span class="math inline">\(\log P(D|\theta)\)</span> や対数事前確率 <span class="math inline">\(\log P(\theta)\)</span> が有限な値（Finite）として計算できているかを検証します。</p>
+<div id="267b4c7ab585a539" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:46.452065400Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:43.912564900Z&quot;}}" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 各変数の初期対数尤度の確認（命名規則を厳守）</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>model_mixture_v2.point_logps()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>{'w_cluster': np.float64(-0.69),
+ 'mu_cluster': np.float64(-4.41),
+ 'sigma_cluster': np.float64(-3.33),
+ 'obs': np.float64(-69.31),
+ 'order_constraint': np.float32(-inf)}</code></pre>
+</div>
+</div>
+<p><code>order_constraint</code> が <code>-inf</code>（マイナス無限大）である状態は「問題あり」です。 モデルが計算を開始しようとした瞬間に、たまたま mu_cluster[0] が mu_cluster[1] 以上の値になってしまいこのまま pm.sample() を実行しても、初期値が「確率 0（不可能）」な地点に立っているため、 サンプラーが 1 歩も動けずエラーで停止してしまう可能性があります。</p>
+<p><code>initval</code> で初期値を明示的に指定しすることで対応します。</p>
+<div id="5a0523ffec9e1479" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:46.886527800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:46.504965900Z&quot;}}" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># チューニング: initval の設定</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model_mixture_v3:</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    w_cluster <span class="op">=</span> pm.Dirichlet(<span class="st">"w_cluster"</span>, a<span class="op">=</span>np.array([<span class="dv">1</span>, <span class="dv">1</span>]), dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    mu_cluster <span class="op">=</span> pm.TruncatedNormal(<span class="st">"mu_cluster"</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                    mu<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">4</span>], sigma<span class="op">=</span><span class="fl">0.5</span>, lower<span class="op">=</span><span class="dv">1</span>, upper<span class="op">=</span><span class="dv">5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>, initval<span class="op">=</span>[<span class="fl">1.5</span>, <span class="fl">3.8</span>])  <span class="co"># 追加</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    sigma_cluster <span class="op">=</span> pm.TruncatedNormal(<span class="st">"sigma_cluster"</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                                       mu<span class="op">=</span><span class="fl">0.5</span>,  <span class="co"># mu=0 より少し浮かせて安定させる</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                                       sigma<span class="op">=</span><span class="fl">0.5</span>, lower<span class="op">=</span><span class="fl">0.05</span>, upper<span class="op">=</span><span class="fl">1.5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ラベルスイッチングの構造的防止</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    pm.Potential(<span class="st">"order_constraint"</span>, pm.math.switch(mu_cluster[<span class="dv">0</span>] <span class="op">&lt;</span> mu_cluster[<span class="dv">1</span>], <span class="dv">0</span>, <span class="op">-</span>np.inf))</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 截断正規分布をコンポーネントとして定義し、混合モデルを構築</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    dist_component <span class="op">=</span> pm.TruncatedNormal.dist(mu<span class="op">=</span>mu_cluster, sigma<span class="op">=</span>sigma_cluster, lower<span class="op">=</span><span class="dv">1</span>, upper<span class="op">=</span><span class="dv">5</span>, shape<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.Mixture(<span class="st">"obs"</span>, w<span class="op">=</span>w_cluster, comp_dists<span class="op">=</span>dist_component, observed<span class="op">=</span>results_survey,</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>                             dims<span class="op">=</span><span class="st">"id_obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="ca142de504e2d90f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:47.240237200Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:46.960153800Z&quot;}}" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 構築したモデルの可視化</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model_mixture_v3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-22-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b3cdf3966c5cdc8f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:49.099730800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:47.248288600Z&quot;}}" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>model_mixture_v3.point_logps()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>{'w_cluster': np.float64(-0.69),
+ 'mu_cluster': np.float64(-1.99),
+ 'sigma_cluster': np.float64(-2.32),
+ 'obs': np.float64(-56.03),
+ 'order_constraint': np.float32(0.0)}</code></pre>
+</div>
+</div>
+<p><code>'order_constraint'</code> が <code>0.0</code> になり解消しました。 念の為、事前予測を再チェックしてみます。</p>
+<div id="19aacada9f6930d8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:49.524384500Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:49.171906Z&quot;}}" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture_v3:</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    idata_prior_v3 <span class="op">=</span> pm.sample_prior_predictive(samples<span class="op">=</span><span class="dv">100</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [mu_cluster, obs, sigma_cluster, w_cluster]</code></pre>
+</div>
+</div>
+<div id="185ba73dfb309a89" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:47:49.834171800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:49.528690100Z&quot;}}" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>samples_prior_v3 <span class="op">=</span> idata_prior_v3.prior_predictive[<span class="st">"obs"</span>]</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>az.plot_dist(samples_prior_v3, color<span class="op">=</span>COLOR_GRAY)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">1.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 下限"</span>, color<span class="op">=</span>COLOR_RED)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="fl">5.0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"論理的 上限"</span>, color<span class="op">=</span>COLOR_BLUE)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"事前予測分布 --v3"</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>境界値</li>
+<li>二峰姓</li>
+<li>幅</li>
+</ul>
+<p>に問題ないを確認しました。</p>
+</section>
+<section id="推論mcmcサンプリング" class="level2">
+<h2 class="anchored" data-anchor-id="推論mcmcサンプリング">推論（MCMCサンプリング）</h2>
+<p>いよいよベイズ推論を行います。小規模データのため、サンプラーの慎重さ（<code>target_accept</code>）を高めに設定しています。</p>
+<div id="4c275b51e525c9dc" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:15.348894500Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:47:49.887159Z&quot;}}" data-execution_count="25">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture_v3:</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    idata_posterior <span class="op">=</span> pm.sample(draws<span class="op">=</span><span class="dv">2000</span>,  <span class="co"># 推論結果（事後分布）として最終的に採用・記録するサンプル数</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                                tune<span class="op">=</span><span class="dv">1000</span>,  <span class="co"># 本番前の「ウォーミングアップ」の数</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                                chains<span class="op">=</span><span class="dv">4</span>,  <span class="co"># 独立して走らせるシミュレーションの数</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                                target_accept<span class="op">=</span><span class="fl">0.95</span>,  <span class="co"># サンプラーの「慎重（目標採択率）」</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                                random_seed<span class="op">=</span><span class="dv">42</span>)  <span class="co"># 乱数の生成パターン</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [w_cluster, mu_cluster, sigma_cluster]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major":2,"version_minor":0,"model_id":"893899f8a21044dfb19ba4ea1ceedc40","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 1_000 tune and 2_000 draw iterations (4_000 + 8_000 draws total) took 19 seconds.
+There were 10 divergences after tuning. Increase `target_accept` or reparameterize.</code></pre>
+</div>
+</div>
+<p>発散してしまいました。 今回のモデルの発散が起きやすいポイントは主に3つです： 1. pm.Potential による硬い制約境界 — mu[0] &lt; mu[1] の違反時に -inf を返すため、境界付近でサンプラーの曲率が急変する 2. TruncatedNormal の上下限境界 — パラメータが境界に近づくと勾配が不安定になりやすい 3. 混合モデル固有の多峰性 — 重み w が小さいコンポーネントは尤度面が平坦で勾配情報が乏しくなる</p>
+<p>以下のチューニングを行ってみます。 1. <code>target_accept</code> の引き上げ + <code>tune</code> の増加 2. 順序制約の「ソフト化」(<code>orderd transform</code> で代替) 現在の pm.Potential は -inf という硬い壁なので、境界付近で勾配が発散します。これを滑らかなペナルティに置き換えると、サンプラーにとって「優しい地形」になります</p>
+<div id="fd82ecf8fc90ef9d" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:15.628462Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:15.442781600Z&quot;}}" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># チューニング: 順序制約の「ソフト化」</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model_mixture_v4:</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    w_cluster <span class="op">=</span> pm.Dirichlet(<span class="st">"w_cluster"</span>, a<span class="op">=</span>np.array([<span class="dv">1</span>, <span class="dv">1</span>]), dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    mu_cluster <span class="op">=</span> pm.TruncatedNormal(<span class="st">"mu_cluster"</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>                                    mu<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">4</span>],</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>                                    sigma<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>                                    lower<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>                                    upper<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>                                    dims<span class="op">=</span><span class="st">"cluster"</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>                                    initval<span class="op">=</span>[<span class="fl">1.5</span>, <span class="fl">3.8</span>],</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>                                    )  <span class="co"># 追加</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    sigma_cluster <span class="op">=</span> pm.TruncatedNormal(<span class="st">"sigma_cluster"</span>,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>                                       mu<span class="op">=</span><span class="fl">0.5</span>,  <span class="co"># mu=0 より少し浮かせて安定させる</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>                                       sigma<span class="op">=</span><span class="fl">0.5</span>, lower<span class="op">=</span><span class="fl">0.05</span>, upper<span class="op">=</span><span class="fl">1.5</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    pm.Potential(<span class="st">"order_constraint"</span>, pm.logp(pm.Normal.dist(mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.1</span>),</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>                                             mu_cluster[<span class="dv">1</span>] <span class="op">-</span> mu_cluster[<span class="dv">0</span>])</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>                 <span class="cf">if</span> <span class="va">False</span> <span class="cf">else</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>                 <span class="op">-</span><span class="dv">1000</span> <span class="op">*</span> pt.<span class="bu">max</span>([<span class="dv">0</span>, mu_cluster[<span class="dv">0</span>] <span class="op">-</span> mu_cluster[<span class="dv">1</span>]])</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>                 )</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 截断正規分布をコンポーネントとして定義し、混合モデルを構築</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>    dist_component <span class="op">=</span> pm.TruncatedNormal.dist(mu<span class="op">=</span>mu_cluster, sigma<span class="op">=</span>sigma_cluster, lower<span class="op">=</span><span class="dv">1</span>, upper<span class="op">=</span><span class="dv">5</span>, shape<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.Mixture(<span class="st">"obs"</span>, w<span class="op">=</span>w_cluster, comp_dists<span class="op">=</span>dist_component, observed<span class="op">=</span>results_survey,</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>                             dims<span class="op">=</span><span class="st">"id_obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="6a0956eeb5271ac" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:15.820496800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:15.631485300Z&quot;}}" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 構築したモデルの可視化</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model_mixture_v4)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-28-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="91be3dcc66842b44" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:18.816240100Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:15.851826200Z&quot;}}" data-execution_count="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>model_mixture_v4.point_logps()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>{'w_cluster': np.float64(-0.69),
+ 'mu_cluster': np.float64(-1.99),
+ 'sigma_cluster': np.float64(-2.32),
+ 'obs': np.float64(-56.03),
+ 'order_constraint': np.float64(-0.0)}</code></pre>
+</div>
+</div>
+<div id="ac90f1c12ce6ff99" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:53.527134Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:18.886179400Z&quot;}}" data-execution_count="29">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 再推論</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture_v4:</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    idata_posterior <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">2000</span>, target_accept<span class="op">=</span><span class="fl">0.98</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [w_cluster, mu_cluster, sigma_cluster]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major":2,"version_minor":0,"model_id":"98153e2ff76f4d3a8f835f8b94c27259","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 2_000 tune and 2_000 draw iterations (8_000 + 8_000 draws total) took 28 seconds.
+There were 12 divergences after tuning. Increase `target_accept` or reparameterize.</code></pre>
+</div>
+</div>
+<p>まだ発散してしまう為、非中心化パラメトリゼーションを行ってみます。</p>
+<div id="ac312378521440b6" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:53.820289500Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:53.622809Z&quot;}}" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># チューニング: 非中心化パラメトリゼーション</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model(coords<span class="op">=</span>coords) <span class="im">as</span> model_mixture_v5:</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># # --- 構成比率 ---</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    w_cluster <span class="op">=</span> pm.Dirichlet(<span class="st">"w_cluster"</span>, a<span class="op">=</span>np.array([<span class="dv">1</span>, <span class="dv">1</span>]), dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 非中心化: mu</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    mu_offset <span class="op">=</span> pm.Normal(<span class="st">"mu_offset"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    mu_base <span class="op">=</span> np.array([<span class="fl">2.0</span>, <span class="fl">4.0</span>])  <span class="co"># 事前の広がり</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    mu_scale <span class="op">=</span> <span class="fl">0.5</span>  <span class="co"># 事前の広がり</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    mu_cluster <span class="op">=</span> pm.Deterministic(  <span class="co"># ★ ここで元の空間に変換＆記録</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mu_cluster"</span>,</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>        pt.clip(mu_base <span class="op">+</span> mu_offset <span class="op">*</span> mu_scale, <span class="dv">1</span>, <span class="dv">5</span>),</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>        dims<span class="op">=</span><span class="st">"cluster"</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- 非中心化: sigma ---</span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    sigma_offset <span class="op">=</span> pm.HalfNormal(<span class="st">"sigma_offset"</span>, sigma<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"cluster"</span>)</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    mu_sigma <span class="op">=</span> <span class="fl">0.5</span>,  <span class="co"># mu=0 より少し浮かせて安定させる</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    sigma_cluster <span class="op">=</span> pm.Deterministic(</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sigma_cluster"</span>,</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>        pt.clip(mu_sigma <span class="op">+</span> sigma_offset <span class="op">*</span> <span class="fl">0.3</span>, <span class="fl">0.05</span>, <span class="fl">1.5</span>),</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>        dims<span class="op">=</span><span class="st">"cluster"</span></span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- 順序制約（ソフト化） ---</span></span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>    pm.Potential(<span class="st">"order_constraint"</span>, pm.logp(pm.Normal.dist(mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.1</span>),</span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>                                             mu_cluster[<span class="dv">1</span>] <span class="op">-</span> mu_cluster[<span class="dv">0</span>])</span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">False</span> <span class="cf">else</span></span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span><span class="dv">1000</span> <span class="op">*</span> pt.<span class="bu">max</span>([<span class="dv">0</span>, mu_cluster[<span class="dv">0</span>] <span class="op">-</span> mu_cluster[<span class="dv">1</span>]])</span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>                 )</span>
+<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 截断正規分布をコンポーネントとして定義し、混合モデルを構築</span></span>
+<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>    dist_component <span class="op">=</span> pm.TruncatedNormal.dist(</span>
+<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a>        mu<span class="op">=</span>mu_cluster, sigma<span class="op">=</span>sigma_cluster, lower<span class="op">=</span><span class="dv">1</span>, upper<span class="op">=</span><span class="dv">5</span>, shape<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.Mixture(<span class="st">"obs"</span>, w<span class="op">=</span>w_cluster, comp_dists<span class="op">=</span>dist_component, observed<span class="op">=</span>results_survey, dims<span class="op">=</span><span class="st">"id_obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="37ed236aa288b910" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:54.127133900Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:53.823325200Z&quot;}}" data-execution_count="31">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 構築したモデルの可視化</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>pm.model_to_graphviz(model_mixture_v5)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-32-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="81341d6946272552" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:48:56.327997200Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:54.130599Z&quot;}}" data-execution_count="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>model_mixture_v5.point_logps()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>{'w_cluster': np.float64(-0.69),
+ 'mu_offset': np.float64(-1.84),
+ 'sigma_offset': np.float64(-1.45),
+ 'obs': np.float64(-56.92),
+ 'order_constraint': np.float64(-0.0)}</code></pre>
+</div>
+</div>
+<div id="7ec4d7f446e7fdd4" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:49:40.780038100Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:48:56.544448900Z&quot;}}" data-execution_count="33">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 再推論</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture_v5:</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    idata_posterior <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">2000</span>, target_accept<span class="op">=</span><span class="fl">0.98</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [w_cluster, mu_offset, sigma_offset]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major":2,"version_minor":0,"model_id":"28398dd42f5b4e6f8d08b32904a3a4d6","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 2_000 tune and 2_000 draw iterations (8_000 + 8_000 draws total) took 36 seconds.</code></pre>
+</div>
+</div>
+<div id="addaa4c471d74397" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:49:42.138886600Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:49:40.907306500Z&quot;}}" data-execution_count="34">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 推論に成功した為、推論データを保存</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>dir_models <span class="op">=</span> <span class="st">"models"</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>os.makedirs(dir_models, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>PATH_INFERENCE_DATA <span class="op">=</span> os.path.join(dir_models, <span class="st">"inference_mixture_v5.nc"</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>az.to_netcdf(idata_posterior, PATH_INFERENCE_DATA)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<pre><code>'models/inference_mixture_v5.nc'</code></pre>
+</div>
+</div>
+</section>
+<section id="推論結果の診断" class="level2">
+<h2 class="anchored" data-anchor-id="推論結果の診断">推論結果の診断</h2>
+<p>4つの独立した推論（<code>Chain</code>）が同じ答え（事後分布）に辿り着いたか、数学的に診断します。</p>
+<div id="8614639636a066ae" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:49:45.539334900Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:49:42.559223200Z&quot;}}" data-execution_count="35">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 収束具合の可視化</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(idata_posterior, compact<span class="op">=</span><span class="va">True</span>)  <span class="co"># 確認指標が多いため compact=True で可視化します</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-36-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>左図: 各Chain の分布がほぼ綺麗に重なっています。</li>
+<li>右図: 綺麗な毛虫状になっています。</li>
+</ul>
+<p>問題なく収束していそうです。</p>
+<div id="2055aeb7161e27ae" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:49:45.818858400Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:49:45.591521400Z&quot;}}" data-execution_count="36">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R-hat 等の数学的指標を確認します。</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>az.summary(idata_posterior)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">sd</th>
+<th data-quarto-table-cell-role="th">hdi_3%</th>
+<th data-quarto-table-cell-role="th">hdi_97%</th>
+<th data-quarto-table-cell-role="th">mcse_mean</th>
+<th data-quarto-table-cell-role="th">mcse_sd</th>
+<th data-quarto-table-cell-role="th">ess_bulk</th>
+<th data-quarto-table-cell-role="th">ess_tail</th>
+<th data-quarto-table-cell-role="th">r_hat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">mu_offset[Disappointed]</th>
+<td>-1.386</td>
+<td>0.757</td>
+<td>-2.749</td>
+<td>0.104</td>
+<td>0.014</td>
+<td>0.012</td>
+<td>3052.0</td>
+<td>2937.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mu_offset[Enthusiast]</th>
+<td>-0.398</td>
+<td>0.366</td>
+<td>-1.042</td>
+<td>0.307</td>
+<td>0.006</td>
+<td>0.006</td>
+<td>4304.0</td>
+<td>3398.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">w_cluster[Disappointed]</th>
+<td>0.298</td>
+<td>0.101</td>
+<td>0.122</td>
+<td>0.480</td>
+<td>0.002</td>
+<td>0.002</td>
+<td>3551.0</td>
+<td>3370.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">w_cluster[Enthusiast]</th>
+<td>0.702</td>
+<td>0.101</td>
+<td>0.520</td>
+<td>0.878</td>
+<td>0.002</td>
+<td>0.002</td>
+<td>3551.0</td>
+<td>3370.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sigma_offset[Disappointed]</th>
+<td>0.884</td>
+<td>0.678</td>
+<td>0.000</td>
+<td>2.120</td>
+<td>0.012</td>
+<td>0.008</td>
+<td>2397.0</td>
+<td>1882.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sigma_offset[Enthusiast]</th>
+<td>0.765</td>
+<td>0.483</td>
+<td>0.002</td>
+<td>1.610</td>
+<td>0.008</td>
+<td>0.006</td>
+<td>2918.0</td>
+<td>1765.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">mu_cluster[Disappointed]</th>
+<td>1.344</td>
+<td>0.325</td>
+<td>1.000</td>
+<td>1.928</td>
+<td>0.006</td>
+<td>0.006</td>
+<td>2980.0</td>
+<td>2937.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mu_cluster[Enthusiast]</th>
+<td>3.801</td>
+<td>0.183</td>
+<td>3.479</td>
+<td>4.154</td>
+<td>0.003</td>
+<td>0.003</td>
+<td>4304.0</td>
+<td>3398.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sigma_cluster[Disappointed]</th>
+<td>0.765</td>
+<td>0.203</td>
+<td>0.500</td>
+<td>1.136</td>
+<td>0.004</td>
+<td>0.002</td>
+<td>2395.0</td>
+<td>1882.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">sigma_cluster[Enthusiast]</th>
+<td>0.729</td>
+<td>0.145</td>
+<td>0.501</td>
+<td>0.983</td>
+<td>0.002</td>
+<td>0.002</td>
+<td>2918.0</td>
+<td>1765.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li>r_hat(<span class="math inline">\(\hat{R}\)</span>: 収束診断指標)が1.01未満。</li>
+<li>ess_bulk(平均の推定のキレ)が 400以上</li>
+<li>ess_tail(極端な値の正確性)が 400以上</li>
+</ul>
+<p>上記より数学的指標からも問題なく推論できていると確認出来ました。</p>
+</section>
+<section id="事後予測チェック" class="level2">
+<h2 class="anchored" data-anchor-id="事後予測チェック">事後予測チェック</h2>
+<p>推定されたモデル（事後分布）を使ってデータを再生成しヒストグラムの形状を「モデルが正しく模倣できているか」を検証します。</p>
+<div id="6bfb4b81a143887c" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:50:02.714845200Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:49:45.995761800Z&quot;}}" data-execution_count="37">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> model_mixture_v5:</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 事後予測サンプリング</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 推論済みのモデルとデータ(idata_posterior)を使ってデータを再生成します</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    pm.sample_posterior_predictive(idata_posterior, extend_inferencedata<span class="op">=</span><span class="va">True</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 実際のデータと予測データの分布を重ねて可視化</span></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">5</span>))</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>az.plot_ppc(idata_posterior, num_pp_samples<span class="op">=</span><span class="dv">100</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"事後予測チェック (Posterior Predictive Check)"</span>)</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">0</span>, <span class="dv">6</span>)</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [obs]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major":2,"version_minor":0,"model_id":"73d78514af964e8ebb671b373b8fcfc5","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 1100x500 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-38-output-5.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="各線の意味" class="level3">
+<h3 class="anchored" data-anchor-id="各線の意味">各線の意味</h3>
+<p>このグラフは、「現実のデータ」と「構築した確率モデルで生成したシミュレーション」の答え合わせ を行っています。</p>
+<ul>
+<li><p><strong>白い実線（Observed）</strong> 「現実のアンケート結果」 です。 EDA で確認したヒストグラムの輪郭を滑らかな線（カーネル密度推定）にしたものです。1.5付近に小さなコブ、3.8付近に大きな山があります。</p></li>
+<li><p><strong>紫の無数の細い線（Posterior predictive）</strong> 「構築した確率モデルの事後分布から生成したシミュレーションデータ」 です。 推論結果に基づいて「こういうデータが発生するはずだ」と何百回も予測した結果です。 線の広がりは、予測の「不確実性（ばらつき）」を表します。</p></li>
+<li><p><strong>水色の太い破線（Posterior predictive mean）</strong> 「構築した確率モデルの事後分布から生成した予測の平均値（中心）」 です。 紫の細い線を平均化した、モデルの最も期待される形状を示しています。</p></li>
+</ul>
+</section>
+<section id="解釈" class="level3">
+<h3 class="anchored" data-anchor-id="解釈">解釈</h3>
+<ol type="1">
+<li>「水色の破線が、白い実線をなぞっているか？」 を注視します。 右側の大きな山（満足層）はもちろんのこと、左側の小さなコブ（失望層）の起伏までも、水色の破線が追従できています。 もし、最初に「単一の正規分布」でモデルを組んでいた場合、水色の線は3.2点付近を頂点とする「のっぺりとした1つの釣り鐘方」になり 1.5点の峰は完全に無視されていたはずです。この図は、「多様性の分離（混合モデル）」という選択を数学的に強固にしてくれています。</li>
+<li>EDAの段階では「単なる数人のクレーマー（外れ値）」として片付けられそうだった低いスコアが、このプロットにより <strong>「偶然ではなく、構造（クラスター）を持った集団である」と確度を大きくあげたことになります。 ステークホルダーに対して、「これは単なるデータのブレではなく、モデルが『明確な顧客層がここにある』と警告しています。」</strong> と、説得力を持って報告できる状態になります。</li>
+</ol>
+<div id="ab51c0575a3654f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:50:03.868783100Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:50:03.141541Z&quot;}}" data-execution_count="38">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># エナジープロット</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>))</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>az.plot_energy(idata_posterior)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"エナジープロット"</span>)</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 700x500 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-39-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="エナジープロット" class="level4">
+<h4 class="anchored" data-anchor-id="エナジープロット">エナジープロット</h4>
+<p>出力されたグラフには、 <strong>2つの分布（線）</strong>が描かれます。</p>
+<section id="marginal-energy周辺エネルギー分布" class="level5">
+<h5 class="anchored" data-anchor-id="marginal-energy周辺エネルギー分布">Marginal Energy（周辺エネルギー分布）</h5>
+<p>パラメータ空間全体の「地形の複雑さ（ポテンシャルエネルギー）」を示します。</p>
+</section>
+<section id="energy-transitionエネルギー遷移分布" class="level5">
+<h5 class="anchored" data-anchor-id="energy-transitionエネルギー遷移分布">Energy Transition（エネルギー遷移分布）</h5>
+<p>サンプラー（調査員）が1歩進むごとに、どれくらいスムーズに地形を移動できたか（運動エネルギー）を示します。</p>
+<blockquote class="blockquote">
+<h5 id="定義" class="anchored">定義】</h5>
+<p>HMC（ハミルトニアン・モンテカルロ）におけるエネルギーの保存則を評価するものです。 理想的なサンプリングが行われている場合、これら2つの分布（Marginal と Transition）はほぼ完全に重なり合います。</p>
+</blockquote>
+<p>「サンプラー(調査員)が、山の斜面を引っかからずにスムーズに歩き回れたか」のようなイメージになります。 - <strong>合格（重なっている）</strong> : サンプラーが山の麓から頂上まで、くまなく探索できた（サンプリングは高効率で信頼できる）。 - <strong>不合格（大きくズレている / Marginalの方が極端に広い）</strong> : サンプラーが特定の深い谷底にハマってしまい、山全体を十分に探索しきれなった（推論結果に偏りがある可能性がある）。</p>
+<p>もしこの2つの線が大きくズレている場合（特に複雑な階層モデルや混合モデルで起こりやすいです）、サンプラーの慎重さである target_accept をさらに高くする（例: 0.99）か、事前分布の初期値などを再チューニングする必要があります。</p>
+<p>今回のモデルは、截断正規分布や順序制約を入れて構造を安定させているため、綺麗な一致が見られています。</p>
+</section>
+</section>
+</section>
+</section>
+<section id="意思決定プロセスの実行" class="level2">
+<h2 class="anchored" data-anchor-id="意思決定プロセスの実行">意思決定プロセスの実行</h2>
+<p>推論されたパラメータ（事後分布）を用いて、データの背後に隠れていた「真の構造」を視覚化します。</p>
+<div id="d29cff442113dae" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;ExecuteTime&quot;,&quot;value&quot;:{&quot;end_time&quot;:&quot;2026-02-22T02:50:04.538901800Z&quot;,&quot;start_time&quot;:&quot;2026-02-22T02:50:04.198563700Z&quot;}}" data-execution_count="39">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># クラスター密度図</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 事後分布から各パラメータの平均値を取得（推論結果の代表値）</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>post_w <span class="op">=</span> idata_posterior.posterior[<span class="st">"w_cluster"</span>].mean(dim<span class="op">=</span>[<span class="st">"chain"</span>, <span class="st">"draw"</span>]).values</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>post_mu <span class="op">=</span> idata_posterior.posterior[<span class="st">"mu_cluster"</span>].mean(dim<span class="op">=</span>[<span class="st">"chain"</span>, <span class="st">"draw"</span>]).values</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>post_sigma <span class="op">=</span> idata_posterior.posterior[<span class="st">"sigma_cluster"</span>].mean(dim<span class="op">=</span>[<span class="st">"chain"</span>, <span class="st">"draw"</span>]).values</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">6</span>, <span class="dv">500</span>)</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">5</span>))</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [COLOR_PURPLE, COLOR_YELLOW]</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="st">"ネガティブ層"</span>, <span class="st">"ポジティブ層"</span>]</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 推定された２つのグループの分布を描画</span></span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(coords[<span class="st">"cluster"</span>]):</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> post_w[i] <span class="op">*</span> (<span class="dv">1</span> <span class="op">/</span> (post_sigma[i] <span class="op">*</span> np.sqrt(<span class="dv">2</span> <span class="op">*</span> np.pi))) <span class="op">*</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> post_mu[i]) <span class="op">/</span> post_sigma[i]) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>    plt.fill_between(x, y, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span>colors[i], label<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>labels[i]<span class="sc">}</span><span class="ss">) (w=</span><span class="sc">{</span>post_w[i]<span class="sc">:.1%}</span><span class="ss">)"</span>)</span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>plt.scatter(results_survey,</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>            np.zeros_like(results_survey),</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>            color<span class="op">=</span>COLOR_GREEN,</span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>            s<span class="op">=</span><span class="dv">50</span>,</span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a>            zorder<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a>            label<span class="op">=</span><span class="st">"アンケート結果"</span>)</span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"クラスター密度図"</span>)</span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"満足度スコア"</span>)</span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"密度（クラスター割合による重み付け）"</span>)</span>
+<span id="cb58-28"><a href="#cb58-28" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb58-29"><a href="#cb58-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mixture_model_inference_files/figure-html/cell-40-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="つの山事後分布" class="level3">
+<h3 class="anchored" data-anchor-id="つの山事後分布">1. 2つの山（事後分布）</h3>
+<p>推論の結果得られた、各グループの満足度スコアの確率密度分布です。山の高さはそのスコア周辺に顧客が集中している度合い（確信度）を示します。 山が 2 つあることは、顧客の満足度が 1 つの「普通（平均）」に集まっているのではなく、二つに分かれていることを証明しています。</p>
+<p>つまり、今回のアンケート結果は、全体の平均点だけを見れば「3点台前半であり、全体的にまずまずの評価」と見誤る危険な状態でした。 しかし、混合分布モデルを用いて顧客の評価構造を分離した結果、顧客は「1つの平均的な集団」ではなく「全く異なる評価軸を持つ2つの集団」に明確に分断されていることが判明しました。</p>
+</section>
+<section id="重み比率" class="level3">
+<h3 class="anchored" data-anchor-id="重み比率">2. 重み（：比率）</h3>
+<p><strong>凡例の</strong>各グループが全体に占める推定比率です。 全顧客 40 人のうち、約 28 人がポジティブ層、12 人がネガティブ層という勢力図が見えてきました。 - <strong>ポジティブ層（約70.2%）</strong> 顧客の約7割は、平均3.8点という高い満足度を示しています。 現在のプロダクト・サービスの価値は、市場の大多数に好意的に評価されている解釈できます。 - <strong>ネガティブ層（約29.8%）</strong> 一方で、残りの約 3割の顧客は、平均1.5点という強い不満を抱えています。 彼らの声は、7割のポジティブな声に埋もれていたと言えます。</p>
+</section>
+<section id="プロットアンケート結果緑の点" class="level3">
+<h3 class="anchored" data-anchor-id="プロットアンケート結果緑の点">3. プロット（アンケート結果：緑の点）</h3>
+<p>実際に観測されたの生データ（アンケート結果）になります 。 シミュレーションの結果（山）が、実際の点（事実）をしっかり覆っていることから、このモデルが現実を正しく捉えていることが分かります 。</p>
+</section>
+</section>
+<section id="ビジネスインパクト" class="level2">
+<h2 class="anchored" data-anchor-id="ビジネスインパクト">ビジネスインパクト</h2>
+<p>この約3割のネガティブ層は強いペインを抱えている可能性があります。 この層を放置することは、<strong>高確率でのチャーン（解約・離脱）</strong> を招くだけでなく、SNS等でのネガティブな口コミによるブランド毀損の火種となる可能性があります。 「全体の平均点を4点に上げる」といった全体施策ではなく、ターゲットを明確に分けた戦略が有効と考えます。</p>
+</section>
+<section id="推奨アクションの提案案" class="level2">
+<h2 class="anchored" data-anchor-id="推奨アクションの提案案">推奨アクションの提案案</h2>
+<p>顧客が二極化している以上、施策も<strong>「守り」</strong>と<strong>「攻め」</strong>の二段構えで実行することが有効であると考えます。</p>
+<section id="守り-ネガティブ層約30の止血と原因究明" class="level3">
+<h3 class="anchored" data-anchor-id="守り-ネガティブ層約30の止血と原因究明">1. 【守り】 ネガティブ層（約30%）の「止血」と原因究明</h3>
+<p>平均1.5点をつけている顧客は、何かしらの「致命的な体験」をしています。この顧客層を救い出すことが最優先課題です。 - <strong>属性の特定（Who）</strong>: アンケートデータと顧客データベースを突合し、ネガティブ層の共通属性（例：特定プランの契約者、利用開始から1ヶ月未満、特定の流入経路など）を調査します。 - <strong>ペインの深堀り（What/Why）</strong>: 該当顧客に対して、CS（カスタマーサクセス）部門から優先的に個別ヒアリングやアウトバウンドコールを実施し、「どこでつまずいたのか（オンボーディングの失敗か、特定機能のバグか、期待値のズレか）」を特定します。 - <strong>即時リカバリー（How）</strong>: 個別のサポート対応や、不満を解消するためのチュートリアルの改善など、ピンポイントな消火活動を行います。</p>
+</section>
+<section id="攻め-ポジティブ層約70の価値最大化" class="level3">
+<h3 class="anchored" data-anchor-id="攻め-ポジティブ層約70の価値最大化">2. 【攻め】 ポジティブ層（約70%）の「価値最大化」</h3>
+<p>7割の顧客には現状の価値が提供できているため、ネガティブ層に引っ張られて <strong>「プロダクトの根本的な仕様を変更する」ことは避けるべき</strong>です（ポジティブ層を冷めさせるリスクがあります）。 - <strong>LTVの向上</strong>: 現状のサービス提供を維持しつつ、彼らに対して上位プランへのアップセルや、クロスセルの提案を行います。 - <strong>アンバサダー化</strong>: ロイヤリティの高いこの層に向けた「紹介キャンペーン（リファラル施策）」や、「導入事例（ケーススタディ）への登壇依頼」などを行い、新たな顧客獲得の原動力とします。</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/petalab-io\.github\.io\/bayesian-iroha\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
